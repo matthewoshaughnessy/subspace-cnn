@@ -16,11 +16,11 @@
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Clear Variables, Close Current Figures, and Create Results Directory 
+%% Clear Variables, Close Current Figures, and Create Results Directory
 clc;
 clear all;
 close all;
-mkdir('Results//'); %Directory for Storing Results
+%mkdir('Results//');
 
 %% Configurations/Parameters
 dataFileName = 'sharky.spirals.points'; %sharky.linear.points - sharky.circle.points - sharky.wave.points - sharky.spirals.points
@@ -68,11 +68,11 @@ Samples = [ones(length(Samples(:,1)),1) Samples];
 %% Calculate TargetOutputs %TODO needs to be general for any nbrOfOutUnits
 TargetOutputs = zeros(length(TargetClasses), nbrOfOutUnits);
 for i=1:length(TargetClasses)
-    if (TargetClasses(i) == 1)
-        TargetOutputs(i,:) = [1 unipolarBipolarSelector];
-    else
-        TargetOutputs(i,:) = [unipolarBipolarSelector 1];
-    end
+  if (TargetClasses(i) == 1)
+    TargetOutputs(i,:) = [1 unipolarBipolarSelector];
+  else
+    TargetOutputs(i,:) = [unipolarBipolarSelector 1];
+  end
 end
 
 %% Initialize Random Wieghts Matrices
@@ -80,10 +80,10 @@ Weights = cell(1, nbrOfLayers); %Weights connecting bias nodes with previous lay
 Delta_Weights = cell(1, nbrOfLayers);
 ResilientDeltas = Delta_Weights; % Needed in case that Resilient Gradient Descent is used
 for i = 1:length(Weights)-1
-    Weights{i} = 2*rand(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1))-1; %RowIndex: From Node Number, ColumnIndex: To Node Number
-    Weights{i}(:,1) = 0; %Bias nodes weights with previous layer (Redundant step)
-    Delta_Weights{i} = zeros(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1));
-    ResilientDeltas{i} = deltas_start*ones(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1));
+  Weights{i} = 2*rand(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1))-1; %RowIndex: From Node Number, ColumnIndex: To Node Number
+  Weights{i}(:,1) = 0; %Bias nodes weights with previous layer (Redundant step)
+  Delta_Weights{i} = zeros(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1));
+  ResilientDeltas{i} = deltas_start*ones(nbrOfNodesPerLayer(i), nbrOfNodesPerLayer(i+1));
 end
 Weights{end} = ones(nbrOfNodesPerLayer(end), 1); %Virtual Weights for Output Nodes
 Old_Delta_Weights_for_Momentum = Delta_Weights;
@@ -91,7 +91,7 @@ Old_Delta_Weights_for_Resilient = Delta_Weights;
 
 NodesActivations = cell(1, nbrOfLayers);
 for i = 1:length(NodesActivations)
-    NodesActivations{i} = zeros(1, nbrOfNodesPerLayer(i));
+  NodesActivations{i} = zeros(1, nbrOfNodesPerLayer(i));
 end
 NodesBackPropagatedErrors = NodesActivations; %Needed for Backpropagation Training Backward Pass
 
@@ -101,164 +101,178 @@ nbrOfEpochs_done = 0;
 %% Iterating all the Data
 MSE = -1 * ones(1,nbrOfEpochs_max);
 for Epoch = 1:nbrOfEpochs_max
-    
-    for Sample = 1:length(Samples(:,1))
-        %% Backpropagation Training
-        %Forward Pass
-        NodesActivations{1} = Samples(Sample,:);
-        for Layer = 2:nbrOfLayers
-            NodesActivations{Layer} = NodesActivations{Layer-1}*Weights{Layer-1};
-            NodesActivations{Layer} = Activation_func(NodesActivations{Layer}, unipolarBipolarSelector);
-            if (Layer ~= nbrOfLayers) %Because bias nodes don't have weights connected to previous layer
-                NodesActivations{Layer}(1) = 1;
-            end
-        end
-        
-        % Backward Pass Errors Storage
-        % (As gradient of the bias nodes are zeros, they won't contribute to previous layer errors nor delta_weights)
-        NodesBackPropagatedErrors{nbrOfLayers} =  TargetOutputs(Sample,:)-NodesActivations{nbrOfLayers};
-        for Layer = nbrOfLayers-1:-1:1
-            gradient = Activation_func_drev(NodesActivations{Layer+1}, unipolarBipolarSelector);
-            for node=1:length(NodesBackPropagatedErrors{Layer}) % For all the Nodes in current Layer
-                NodesBackPropagatedErrors{Layer}(node) =  sum( NodesBackPropagatedErrors{Layer+1} .* gradient .* Weights{Layer}(node,:) );
-            end
-        end
-        
-        % Backward Pass Delta Weights Calculation (Before multiplying by learningRate)
-        for Layer = nbrOfLayers:-1:2
-            derivative = Activation_func_drev(NodesActivations{Layer}, unipolarBipolarSelector);    
-            Delta_Weights{Layer-1} = Delta_Weights{Layer-1} + NodesActivations{Layer-1}' * (NodesBackPropagatedErrors{Layer} .* derivative);
-        end
+  
+  for Sample = 1:length(Samples(:,1))
+    %% Backpropagation Training
+    %Forward Pass
+    NodesActivations{1} = Samples(Sample,:);
+    for Layer = 2:nbrOfLayers
+      NodesActivations{Layer} = NodesActivations{Layer-1}*Weights{Layer-1};
+      NodesActivations{Layer} = Activation_func(NodesActivations{Layer}, unipolarBipolarSelector);
+      if (Layer ~= nbrOfLayers) %Because bias nodes don't have weights connected to previous layer
+        NodesActivations{Layer}(1) = 1;
+      end
     end
     
-    %% Apply resilient gradient descent or/and momentum to the delta_weights
-    if (enable_resilient_gradient_descent) % Handle Resilient Gradient Descent
-        if (mod(Epoch,200)==0) %Reset Deltas
-            for Layer = 1:nbrOfLayers
-                ResilientDeltas{Layer} = learningRate*Delta_Weights{Layer};
-            end
-        end
-        for Layer = 1:nbrOfLayers-1
-            mult = Old_Delta_Weights_for_Resilient{Layer} .* Delta_Weights{Layer};
-            ResilientDeltas{Layer}(mult > 0) = ResilientDeltas{Layer}(mult > 0) * learningRate_plus; % Sign didn't change
-            ResilientDeltas{Layer}(mult < 0) = ResilientDeltas{Layer}(mult < 0) * learningRate_negative; % Sign changed
-            ResilientDeltas{Layer} = max(deltas_min, ResilientDeltas{Layer});
-            ResilientDeltas{Layer} = min(deltas_max, ResilientDeltas{Layer});
-
-            Old_Delta_Weights_for_Resilient{Layer} = Delta_Weights{Layer};
-
-            Delta_Weights{Layer} = sign(Delta_Weights{Layer}) .* ResilientDeltas{Layer};
-        end
+    % Backward Pass Errors Storage
+    % (As gradient of the bias nodes are zeros, they won't contribute to previous layer errors nor delta_weights)
+    NodesBackPropagatedErrors{nbrOfLayers} =  TargetOutputs(Sample,:)-NodesActivations{nbrOfLayers};
+    for Layer = nbrOfLayers-1:-1:1
+      gradient = Activation_func_drev(NodesActivations{Layer+1}, unipolarBipolarSelector);
+      for node=1:length(NodesBackPropagatedErrors{Layer}) % For all the Nodes in current Layer
+        NodesBackPropagatedErrors{Layer}(node) =  sum( NodesBackPropagatedErrors{Layer+1} .* gradient .* Weights{Layer}(node,:) );
+      end
     end
-    if (enable_learningRate_momentum) %Apply Momentum
-        for Layer = 1:nbrOfLayers
-            Delta_Weights{Layer} = learningRate*Delta_Weights{Layer} + momentum_alpha*Old_Delta_Weights_for_Momentum{Layer}; 
-        end
-        Old_Delta_Weights_for_Momentum = Delta_Weights;
+    
+    % Backward Pass Delta Weights Calculation (Before multiplying by learningRate)
+    for Layer = nbrOfLayers:-1:2
+      derivative = Activation_func_drev(NodesActivations{Layer}, unipolarBipolarSelector);
+      Delta_Weights{Layer-1} = Delta_Weights{Layer-1} + NodesActivations{Layer-1}' * (NodesBackPropagatedErrors{Layer} .* derivative);
     end
-    if (~enable_learningRate_momentum && ~enable_resilient_gradient_descent)
-        for Layer = 1:nbrOfLayers
-            Delta_Weights{Layer} = learningRate * Delta_Weights{Layer};
-        end
+  end
+  
+  %% Apply resilient gradient descent or/and momentum to the delta_weights
+  if (enable_resilient_gradient_descent) % Handle Resilient Gradient Descent
+    if (mod(Epoch,200)==0) %Reset Deltas
+      for Layer = 1:nbrOfLayers
+        ResilientDeltas{Layer} = learningRate*Delta_Weights{Layer};
+      end
     end
-
-    %% Backward Pass Weights Update
     for Layer = 1:nbrOfLayers-1
-        Weights{Layer} = Weights{Layer} + Delta_Weights{Layer};
+      mult = Old_Delta_Weights_for_Resilient{Layer} .* Delta_Weights{Layer};
+      ResilientDeltas{Layer}(mult > 0) = ResilientDeltas{Layer}(mult > 0) * learningRate_plus; % Sign didn't change
+      ResilientDeltas{Layer}(mult < 0) = ResilientDeltas{Layer}(mult < 0) * learningRate_negative; % Sign changed
+      ResilientDeltas{Layer} = max(deltas_min, ResilientDeltas{Layer});
+      ResilientDeltas{Layer} = min(deltas_max, ResilientDeltas{Layer});
+      
+      Old_Delta_Weights_for_Resilient{Layer} = Delta_Weights{Layer};
+      
+      Delta_Weights{Layer} = sign(Delta_Weights{Layer}) .* ResilientDeltas{Layer};
     end
+  end
+  if (enable_learningRate_momentum) %Apply Momentum
+    for Layer = 1:nbrOfLayers
+      Delta_Weights{Layer} = learningRate*Delta_Weights{Layer} + momentum_alpha*Old_Delta_Weights_for_Momentum{Layer};
+    end
+    Old_Delta_Weights_for_Momentum = Delta_Weights;
+  end
+  if (~enable_learningRate_momentum && ~enable_resilient_gradient_descent)
+    for Layer = 1:nbrOfLayers
+      Delta_Weights{Layer} = learningRate * Delta_Weights{Layer};
+    end
+  end
+  
+  %% Backward Pass Weights Update
+  for Layer = 1:nbrOfLayers-1
+    Weights{Layer} = Weights{Layer} + Delta_Weights{Layer};
+  end
+  
+  % Resetting Delta_Weights to Zeros
+  for Layer = 1:length(Delta_Weights)
+    Delta_Weights{Layer} = 0 * Delta_Weights{Layer};
+  end
+  
+  %% Decrease Learning Rate
+  if (enable_decrease_learningRate)
+    new_learningRate = learningRate - learningRate_decreaseValue;
+    learningRate = max(min_learningRate, new_learningRate);
+  end
+  
+  %% Evaluation
+  for Sample = 1:length(Samples(:,1))
+    outputs = EvaluateNetwork(Samples(Sample,:), NodesActivations, Weights, unipolarBipolarSelector);
+    bound = (1+unipolarBipolarSelector)/2;
+    if (outputs(1) >= bound && outputs(2) < bound) %TODO: Not generic role for any number of output nodes
+      ActualClasses(Sample) = 1;
+    elseif (outputs(1) < bound && outputs(2) >= bound)
+      ActualClasses(Sample) = 0;
+    else
+      if (outputs(1) >= outputs(2))
+        ActualClasses(Sample) = 1;
+      else
+        ActualClasses(Sample) = 0;
+      end
+    end
+  end
+  
+  MSE(Epoch) = sum((ActualClasses-TargetClasses).^2)/(length(Samples(:,1)));
+  if (MSE(Epoch) == 0)
+    zeroRMSReached = 1;
+  end
+  
+  %% Visualization
+  if (zeroRMSReached || mod(Epoch,draw_each_nbrOfEpochs)==0)
     
-    % Resetting Delta_Weights to Zeros
-    for Layer = 1:length(Delta_Weights)
-        Delta_Weights{Layer} = 0 * Delta_Weights{Layer};
-    end
-
-    %% Decrease Learning Rate
-    if (enable_decrease_learningRate)
-        new_learningRate = learningRate - learningRate_decreaseValue;
-        learningRate = max(min_learningRate, new_learningRate);
-    end
+    % plot decision boundary
+    unique_TargetClasses = unique(TargetClasses);
+    training_colors = {'y.', 'b.'};
+    separation_colors = {'g.', 'r.'};
+    subplot(2,2,1);
+    cla;
+    hold on;
+    title({sprintf('Epoch %d/%d',Epoch,nbrOfEpochs_max),'Decision boundary'});
     
-    %% Evaluation
-    for Sample = 1:length(Samples(:,1))
-        outputs = EvaluateNetwork(Samples(Sample,:), NodesActivations, Weights, unipolarBipolarSelector);
+    margin = 0.05; step = 0.05;
+    xlim([min(Samples(:,2))-margin max(Samples(:,2))+margin]);
+    ylim([min(Samples(:,3))-margin max(Samples(:,3))+margin]);
+    for x = min(Samples(:,2))-margin : step : max(Samples(:,2))+margin
+      for y = min(Samples(:,3))-margin : step : max(Samples(:,3))+margin
+        outputs = EvaluateNetwork([1 x y], NodesActivations, Weights, unipolarBipolarSelector);
         bound = (1+unipolarBipolarSelector)/2;
         if (outputs(1) >= bound && outputs(2) < bound) %TODO: Not generic role for any number of output nodes
-            ActualClasses(Sample) = 1;
+          plot(x, y, separation_colors{1}, 'markersize', 18);
         elseif (outputs(1) < bound && outputs(2) >= bound)
-            ActualClasses(Sample) = 0;
+          plot(x, y, separation_colors{2}, 'markersize', 18);
         else
-            if (outputs(1) >= outputs(2))
-                ActualClasses(Sample) = 1;
-            else
-                ActualClasses(Sample) = 0;
-            end
+          if (outputs(1) >= outputs(2))
+            plot(x, y, separation_colors{1}, 'markersize', 18);
+          else
+            plot(x, y, separation_colors{2}, 'markersize', 18);
+          end
         end
+      end
     end
     
-    MSE(Epoch) = sum((ActualClasses-TargetClasses).^2)/(length(Samples(:,1)));
-    if (MSE(Epoch) == 0)
-        zeroRMSReached = 1;
+    for i = 1:length(unique_TargetClasses)
+      points = Samples(TargetClasses==unique_TargetClasses(i), 2:end);
+      plot(points(:,1), points(:,2), training_colors{i}, 'markersize', 10);
     end
-        
-    %% Visualization
-    if (zeroRMSReached || mod(Epoch,draw_each_nbrOfEpochs)==0)
-        % Draw Decision Boundary
-        unique_TargetClasses = unique(TargetClasses);
-        training_colors = {'y.', 'b.'};
-        separation_colors = {'g.', 'r.'};
-        subplot(2,1,1);
-        cla;
-        hold on;
-        title(['Decision Boundary at Epoch Number ' int2str(Epoch) '. The max number of Epochs is ' int2str(nbrOfEpochs_max) '.']);
-
-        margin = 0.05; step = 0.05;
-        xlim([min(Samples(:,2))-margin max(Samples(:,2))+margin]);
-        ylim([min(Samples(:,3))-margin max(Samples(:,3))+margin]);
-        for x = min(Samples(:,2))-margin : step : max(Samples(:,2))+margin
-            for y = min(Samples(:,3))-margin : step : max(Samples(:,3))+margin
-                outputs = EvaluateNetwork([1 x y], NodesActivations, Weights, unipolarBipolarSelector);
-                bound = (1+unipolarBipolarSelector)/2;
-                if (outputs(1) >= bound && outputs(2) < bound) %TODO: Not generic role for any number of output nodes
-                    plot(x, y, separation_colors{1}, 'markersize', 18);
-                elseif (outputs(1) < bound && outputs(2) >= bound)
-                    plot(x, y, separation_colors{2}, 'markersize', 18);
-                else
-                    if (outputs(1) >= outputs(2))
-                        plot(x, y, separation_colors{1}, 'markersize', 18);
-                    else
-                        plot(x, y, separation_colors{2}, 'markersize', 18);
-                    end
-                end
-            end
-        end
-
-        for i = 1:length(unique_TargetClasses)
-            points = Samples(TargetClasses==unique_TargetClasses(i), 2:end);
-            plot(points(:,1), points(:,2), training_colors{i}, 'markersize', 10);
-        end
-        axis equal;
-
-        % Draw Mean Square Error
-        subplot(2,1,2);
-        MSE(MSE==-1) = [];
-        plot([MSE(1:Epoch)]);
-        ylim([-0.1 0.6]);
-        title('Mean Square Error');
-        xlabel('Epochs');
-        ylabel('MSE');
-        grid on;
-
-        saveas(gcf, sprintf('Results//fig%i.png', Epoch),'jpg');
-        pause(0.05);
-    end
-    display([int2str(Epoch) ' Epochs done out of ' int2str(nbrOfEpochs_max) ' Epochs. MSE = ' num2str(MSE(Epoch)) ' Learning Rate = ' ...
-        num2str(learningRate) '.']);
+    axis image; axis off; set(gca,'fontsize',16);
     
-    nbrOfEpochs_done = Epoch;
-    if (zeroRMSReached)
-        saveas(gcf, sprintf('Results//Final Result for %s.png', dataFileName),'jpg');
-        break;
+    % plot MSE
+    subplot(2,2,3);
+    MSE(MSE==-1) = [];
+    plot(MSE(1:Epoch));
+    ylim([-0.1 0.6]);
+    title('Mean square error');
+    xlabel('Epoch');
+    ylabel('MSE');
+    grid on;
+    set(gca,'fontsize',16);
+    
+    % plot weights
+    for i = 1:nbrOfLayers-1
+      subplot(nbrOfLayers-1,2,2*i);
+      imagesc(Weights{i}); colorbar; axis image;
+      title(sprintf('W_{%d}: layer %d (%d units) -> layer %d (%d units)',...
+        i,nbrOfNodesPerLayer(i),i+1,nbrOfNodesPerLayer(i+1)));
+      set(gca, 'fontsize', 16, ...
+        'xtick', 1:nbrOfNodesPerLayer(i+1), ...
+        'ytick', 1:nbrOfNodesPerLayer(i), ...
+        'xticklabel', [], ...
+        'yticklabel', []);
     end
     
+    %saveas(gcf, sprintf('Results//fig%i.png', Epoch),'jpg');
+    drawnow;
+  end
+  fprintf('Epoch %d of %d: MSE = %.4f, learning rate = %.4f.\n',Epoch,nbrOfEpochs_max,MSE(Epoch),learningRate);
+  
+  nbrOfEpochs_done = Epoch;
+  if (zeroRMSReached)
+    %saveas(gcf, sprintf('Results//Final Result for %s.png', dataFileName),'jpg');
+    break;
+  end
+  
 end
-display(['Mean Square Error = ' num2str(MSE(nbrOfEpochs_done)) '.']);
+fprintf('Final MSE = %.4f\n', MSE(nbrOfEpochs_done));
