@@ -16,12 +16,6 @@
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Clear Variables, Close Current Figures, and Create Results Directory
-clc;
-clear all;
-close all;
-%mkdir('Results//');
-
 %% Configurations/Parameters
 dataFileName = 'sharky.spirals.points'; %sharky.linear.points - sharky.circle.points - sharky.wave.points - sharky.spirals.points
 nbrOfNeuronsInEachHiddenLayer = [10 10]; %linear:[4] - circle:[10] - wave,spirals:[10 10]
@@ -201,11 +195,17 @@ for Epoch = 1:nbrOfEpochs_max
   end
   
   %% Visualization
+  
+  fprintf('Epoch %d of %d: MSE = %.4f, learning rate = %.4f.\n', ...
+    Epoch, nbrOfEpochs_max, MSE(Epoch), learningRate);
+  
   if (zeroRMSReached || mod(Epoch,draw_each_nbrOfEpochs)==0)
+    
+    fprintf('Visualizing: calculating decision boundary...');
     
     % plot decision boundary
     unique_TargetClasses = unique(TargetClasses);
-    training_colors = {'y.', 'b.'};
+    training_colors = {'r.', 'c.'};
     separation_colors = {'g.', 'r.'};
     subplot(2,2,1);
     cla;
@@ -213,26 +213,22 @@ for Epoch = 1:nbrOfEpochs_max
     title({sprintf('Epoch %d/%d',Epoch,nbrOfEpochs_max),'Decision boundary'});
     
     margin = 0.05; step = 0.05;
-    xlim([min(Samples(:,2))-margin max(Samples(:,2))+margin]);
-    ylim([min(Samples(:,3))-margin max(Samples(:,3))+margin]);
-    for x = min(Samples(:,2))-margin : step : max(Samples(:,2))+margin
-      for y = min(Samples(:,3))-margin : step : max(Samples(:,3))+margin
+    xx = min(Samples(:,2))-margin : step : max(Samples(:,2))+margin;
+    yy = min(Samples(:,3))-margin : step : max(Samples(:,3))+margin;
+    DecisionBound = zeros(length(yy),length(xx));
+    
+    for ix = 1:length(xx)
+      for iy = 1:length(yy)
+        x = xx(ix);
+        y = yy(iy);
         outputs = EvaluateNetwork([1 x y], NodesActivations, Weights, unipolarBipolarSelector);
         bound = (1+unipolarBipolarSelector)/2;
-        if (outputs(1) >= bound && outputs(2) < bound) %TODO: Not generic role for any number of output nodes
-          plot(x, y, separation_colors{1}, 'markersize', 18);
-        elseif (outputs(1) < bound && outputs(2) >= bound)
-          plot(x, y, separation_colors{2}, 'markersize', 18);
-        else
-          if (outputs(1) >= outputs(2))
-            plot(x, y, separation_colors{1}, 'markersize', 18);
-          else
-            plot(x, y, separation_colors{2}, 'markersize', 18);
-          end
-        end
+        DecisionBound(iy,ix) = outputs(1) > outputs(2);
       end
     end
-    
+    imagesc(xx,yy,DecisionBound); hold on;
+    xlim([min(xx) max(xx)]);
+    ylim([min(yy) max(yy)]);
     for i = 1:length(unique_TargetClasses)
       points = Samples(TargetClasses==unique_TargetClasses(i), 2:end);
       plot(points(:,1), points(:,2), training_colors{i}, 'markersize', 10);
@@ -240,6 +236,7 @@ for Epoch = 1:nbrOfEpochs_max
     axis image; axis off; set(gca,'fontsize',16);
     
     % plot MSE
+    fprintf('MSE... ');
     subplot(2,2,3);
     MSE(MSE==-1) = [];
     plot(MSE(1:Epoch));
@@ -251,22 +248,27 @@ for Epoch = 1:nbrOfEpochs_max
     set(gca,'fontsize',16);
     
     % plot weights
+    fprintf('weights...');
     for i = 1:nbrOfLayers-1
       subplot(nbrOfLayers-1,2,2*i);
       imagesc(Weights{i}); colorbar; axis image;
-      title(sprintf('W_{%d}: layer %d (%d units) -> layer %d (%d units)',...
-        i,nbrOfNodesPerLayer(i),i+1,nbrOfNodesPerLayer(i+1)));
-      set(gca, 'fontsize', 16, ...
-        'xtick', 1:nbrOfNodesPerLayer(i+1), ...
-        'ytick', 1:nbrOfNodesPerLayer(i), ...
+      title(sprintf('W_{%d}',i));
+      xlabel(sprintf('layer %d (%d units)',i,nbrOfNodesPerLayer(i)));
+      ylabel(sprintf('layer %d (%d units)',i+1,nbrOfNodesPerLayer(i+1)));
+      set(gca, ...
+        'fontsize', 16, ...
+        'xtick', .5:nbrOfNodesPerLayer(i+1), ...
+        'ytick', .5:nbrOfNodesPerLayer(i), ...
         'xticklabel', [], ...
         'yticklabel', []);
+      grid on;
     end
     
     %saveas(gcf, sprintf('Results//fig%i.png', Epoch),'jpg');
     drawnow;
+    fprintf('done!\n');
+    
   end
-  fprintf('Epoch %d of %d: MSE = %.4f, learning rate = %.4f.\n',Epoch,nbrOfEpochs_max,MSE(Epoch),learningRate);
   
   nbrOfEpochs_done = Epoch;
   if (zeroRMSReached)
