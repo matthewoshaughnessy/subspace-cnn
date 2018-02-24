@@ -1,5 +1,5 @@
 import numpy as np
-
+from cs231n.regularization import *
 """
 This file implements various first-order update rules that are commonly used
 for training neural networks. Each update rule accepts current weights and the
@@ -25,16 +25,21 @@ setting next_w equal to w.
 """
 
 
-def sgd(w, dw, config=None):
+def sgd(w, dw, config=None,dim=None):
     """
     Performs vanilla stochastic gradient descent.
     config format:
     - learning_rate: Scalar learning rate.
     """
+    print('In optim.py. shape of w is:', w.shape)
     if config is None: config = {}
     config.setdefault('learning_rate', 1e-2)
 
     w -= config['learning_rate'] * dw
+    if w.ndim==4:
+        if dim is None: dim = w.shape[2]*w.shape[3]
+        wp = subspace_projection(dim,w)
+        w = wp
     return w, config
 
 
