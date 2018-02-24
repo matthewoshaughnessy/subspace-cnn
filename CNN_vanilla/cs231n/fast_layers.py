@@ -139,7 +139,6 @@ def max_pool_forward_fast(x, pool_param):
     method which is very fast. Otherwise we fall back on the im2col method, which
     is not much faster than the naive method.
     """
-    print(x.dtype)
     N, C, H, W = x.shape
     pool_height, pool_width = pool_param['pool_height'], pool_param['pool_width']
     stride = pool_param['stride']
