@@ -257,7 +257,8 @@ class Solver(object):
             indices = np.random.permutation(np.arange(dim//3,HH*WW - np.int(2*dim//3)))[:dim//3]
             basis_indices[ii,:dim//3] = (np.arange(dim//3)).astype(int)
             basis_indices[ii,dim//3:2*dim//3] = indices
-            basis_indices[ii,2*dim//3:] = (np.arange(HH*WW - dim//3,HH*WW)).astype(int)
+            
+            basis_indices[ii,2*dim//3:] = (np.arange(HH*WW - np.ceil(dim/3).astype(int),HH*WW)).astype(int)
 
         for t in range(num_iterations):
             self._step(HH,WW,basis_indices)
