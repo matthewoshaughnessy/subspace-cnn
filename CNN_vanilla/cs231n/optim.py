@@ -25,25 +25,40 @@ setting next_w equal to w.
 """
 
 
-def sgd(w, dw, config=None,dim=None):
+def sgd(w, dw,HH, WW, config=None,basis_indices=None):
     """
     Performs vanilla stochastic gradient descent.
     config format:
     - learning_rate: Scalar learning rate.
     """
-    print('In optim.py. shape of w is:', w.shape)
     if config is None: config = {}
     config.setdefault('learning_rate', 1e-2)
-
+    
+    if w.ndim==4 and basis_indices is None:
+        F,C,HH,WW = w.shape
+        if dim is None: dim = np.int(0.5*w.shape[2]*w.shape[3])
+        basis_indices = np.zeros((F,dim))
+        for ii in range(F):
+            indices = np.random.permutation(np.arange(dim//3,HH*WW - np.int(2*dim//3)))[:dim//3]
+            basis_indices[ii,:dim//3] = (np.arange(dim//3)).astype(int)
+            basis_indices[ii,dim//3:2*dim//3] = indices
+            basis_indices[ii,2*dim//3:] = (np.arange(HH*WW - dim//3,HH*WW)).astype(int)
+    
+    # The full basis
+    basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho')
+    
+    dim = basis_indices.shape[1]
+    
     w -= config['learning_rate'] * dw
+    
+    # projection
     if w.ndim==4:
-        if dim is None: dim = w.shape[2]*w.shape[3]
         wp = subspace_projection(dim,w)
         w = wp
     return w, config
 
 
-def sgd_momentum(w, dw, config=None):
+def sgd_momentum(w, dw, HH, WW, config=None,basis_indices=None):
     """
     Performs stochastic gradient descent with momentum.
     config format:
@@ -59,6 +74,20 @@ def sgd_momentum(w, dw, config=None):
     v = config.get('velocity', np.zeros_like(w))
 
     next_w = None
+    
+    if x.ndim==4 and basis_indices is None:
+        F,C,HH,WW = x.shape
+        if dim is None: dim = np.int(0.5*x.shape[2]*x.shape[3])
+        basis_indices = np.zeros((F,dim))
+        for ii in range(F):
+            indices = np.random.permutation(np.arange(dim//3,HH*WW - np.int(2*dim//3)))[:dim//3]
+            basis_indices[ii,:dim//3] = (np.arange(dim//3)).astype(int)
+            basis_indices[ii,dim//3:2*dim//3] = indices
+            basis_indices[ii,2*dim//3:] = (np.arange(HH*WW - dim//3,HH*WW)).astype(int)
+    
+    # The full basis
+    basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho')
+    dim = basis_indices.shape[1]
     ###########################################################################
     # TODO: Implement the momentum update formula. Store the updated value in #
     # the next_w variable. You should also use and update the velocity v.     #
@@ -71,6 +100,11 @@ def sgd_momentum(w, dw, config=None):
     v = mu*v - learning_rate*dw
     w += v
 
+    # projection 
+    if w.ndim==4:
+        wp = subspace_projection(dim,x,basis,basis_indices)
+        w = wp
+        
     next_w = w
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -81,7 +115,7 @@ def sgd_momentum(w, dw, config=None):
 
 
 
-def rmsprop(x, dx, config=None):
+def rmsprop(x, dx, HH, WW, config=None,basis_indices=None):
     """
     Uses the RMSProp update rule, which uses a moving average of squared
     gradient values to set adaptive per-parameter learning rates.
@@ -98,6 +132,20 @@ def rmsprop(x, dx, config=None):
     config.setdefault('epsilon', 1e-8)
     config.setdefault('cache', np.zeros_like(x))
 
+    if x.ndim==4 and basis_indices is None:
+        F,C,HH,WW = x.shape
+        if dim is None: dim = np.int(0.5*x.shape[2]*x.shape[3])
+        basis_indices = np.zeros((F,dim))
+        for ii in range(F):
+            indices = np.random.permutation(np.arange(dim//3,HH*WW - np.int(2*dim//3)))[:dim//3]
+            basis_indices[ii,:dim//3] = (np.arange(dim//3)).astype(int)
+            basis_indices[ii,dim//3:2*dim//3] = indices
+            basis_indices[ii,2*dim//3:] = (np.arange(HH*WW - dim//3,HH*WW)).astype(int)
+    
+    # The full basis
+    basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho')
+    dim = basis_indices.shape[1]
+    
     next_x = None
     ###########################################################################
     # TODO: Implement the RMSprop update formula, storing the next value of x #
@@ -112,7 +160,11 @@ def rmsprop(x, dx, config=None):
     cache = decay_rate*cache + (1-decay_rate) * dx**2
     x += -learning_rate * dx / (np.sqrt(cache) + epsilon)
 
-
+    # projection 
+    if x.ndim==4:
+        wp = subspace_projection(dim,x,basis,basis_indices)
+        x = wp
+    
     next_x = x
 
     config['cache'] = cache
@@ -124,7 +176,7 @@ def rmsprop(x, dx, config=None):
     return next_x, config
 
 
-def adam(x, dx, config=None):
+def adam(x, dx,HH, WW, config=None, basis_indices=None):
     """
     Uses the Adam update rule, which incorporates moving averages of both the
     gradient and its square and a bias correction term.
@@ -152,6 +204,22 @@ def adam(x, dx, config=None):
     # the next_x variable. Don't forget to update the m, v, and t variables   #
     # stored in config.                                                       #
     ###########################################################################
+
+    # Generate a set of indices if nothing is passed on by the paret function
+    if x.ndim==4 and basis_indices is None:
+        F,C,HH,WW = x.shape
+        if dim is None: dim = np.int(0.5*x.shape[2]*x.shape[3])
+        basis_indices = np.zeros((F,dim))
+        for ii in range(F):
+            indices = np.random.permutation(np.arange(dim//3,HH*WW - np.int(2*dim//3)))[:dim//3]
+            basis_indices[ii,:dim//3] = (np.arange(dim//3)).astype(int)
+            basis_indices[ii,dim//3:2*dim//3] = indices
+            basis_indices[ii,2*dim//3:] = (np.arange(HH*WW - dim//3,HH*WW)).astype(int)
+    
+    # The full basis
+    basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho')
+    dim = basis_indices.shape[1]
+    
     m = config.get('m')
     v = config.get('v')
     beta1 = config.get('beta1')
@@ -165,7 +233,11 @@ def adam(x, dx, config=None):
     new_v = beta2*v + (1-beta2)*(dx**2)
     vt = new_v / (1-beta2**t)
     x += -learning_rate * mt / (np.sqrt(vt) + epsilon)
-
+    
+    if x.ndim==4:
+        wp = subspace_projection(dim,x,basis,basis_indices)
+        x = wp
+        
     next_x = x
     config['m'] = new_m
     config['v'] = new_v

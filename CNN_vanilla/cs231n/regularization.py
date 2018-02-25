@@ -10,13 +10,13 @@ def subspace_projection(k,w,basis=None, basis_indices=None):
 	w: Filter coefficient: (F x C x HH x WW )
 	"""
     F,C,HH,WW = w.shape
-    if basis==None:
+    if basis is None:
         basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho')
         
     w_reshaped = np.reshape(w,(F,C,HH*WW),'F')
     w_projected = np.zeros(w_reshaped.shape)
     
-    if basis_indices == None:
+    if basis_indices is None:
         basis_indices = np.zeros((F,k))
         for ii in range(F):
             indices = np.random.permutation(HH*WW)[:k]

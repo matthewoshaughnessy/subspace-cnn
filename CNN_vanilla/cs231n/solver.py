@@ -153,7 +153,7 @@ class Solver(object):
             self.optim_configs[p] = d
 
 
-    def _step(self):
+    def _step(self,HH,WW,basis_indices):
         """
         Make a single gradient update. This is called by train() and should not
         be called manually.
@@ -172,7 +172,7 @@ class Solver(object):
         for p, w in self.model.params.items():
             dw = grads[p]
             config = self.optim_configs[p]
-            next_w, next_config = self.update_rule(w, dw, config)
+            next_w, next_config = self.update_rule(w, dw,HH, WW, config, basis_indices)
             self.model.params[p] = next_w
             self.optim_configs[p] = next_config
 
@@ -238,16 +238,29 @@ class Solver(object):
         return acc
 
 
-    def train(self):
+    def train(self,dim=None):
         """
         Run optimization to train the model.
         """
         num_train = self.X_train.shape[0]
         iterations_per_epoch = max(num_train // self.batch_size, 1)
         num_iterations = self.num_epochs * iterations_per_epoch
+        
+        ## code to generate indices of the basis vectors chosen from the DCT basis 
+        
+        HH = self.model.params['W1'].shape[2]
+        WW = self.model.params['W1'].shape[3]
+        F = self.model.params['W1'].shape[0]
+        if dim is None: dim = np.int(0.5*HH*WW)
+        basis_indices = np.zeros((F,dim))
+        for ii in range(F):
+            indices = np.random.permutation(np.arange(dim//3,HH*WW - np.int(2*dim//3)))[:dim//3]
+            basis_indices[ii,:dim//3] = (np.arange(dim//3)).astype(int)
+            basis_indices[ii,dim//3:2*dim//3] = indices
+            basis_indices[ii,2*dim//3:] = (np.arange(HH*WW - dim//3,HH*WW)).astype(int)
 
         for t in range(num_iterations):
-            self._step()
+            self._step(HH,WW,basis_indices)
 
             # Maybe print training loss
             if self.verbose and t % self.print_every == 0:
