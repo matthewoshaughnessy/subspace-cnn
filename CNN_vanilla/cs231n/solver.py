@@ -5,6 +5,7 @@ from builtins import range
 from builtins import object
 import os
 import pickle as pickle
+from IPython.core.debugger import set_trace
 
 import numpy as np
 
@@ -246,19 +247,32 @@ class Solver(object):
         iterations_per_epoch = max(num_train // self.batch_size, 1)
         num_iterations = self.num_epochs * iterations_per_epoch
         
-        ## code to generate indices of the basis vectors chosen from the DCT basis 
-        
+        ## code to generate indices of the basis vectors chosen from the DCT basis
         HH = self.model.params['W1'].shape[2]
         WW = self.model.params['W1'].shape[3]
         F = self.model.params['W1'].shape[0]
-        if dim is None: dim = np.int(0.5*HH*WW)
+        max_dim = np.int(HH*WW)
+        if dim is None:
+            dim = max_dim
         basis_indices = np.zeros((F,dim))
         for ii in range(F):
-            indices = np.random.permutation(np.arange(dim//3,HH*WW - np.int(2*dim//3)))[:dim//3]
-            basis_indices[ii,:dim//3] = (np.arange(dim//3)).astype(int)
-            basis_indices[ii,dim//3:2*dim//3] = indices
-            
-            basis_indices[ii,2*dim//3:] = (np.arange(HH*WW - np.ceil(dim/3).astype(int),HH*WW)).astype(int)
+            # assign basis vectors according to the policy
+            #  1. first floor(k/3) basis vectors are always assigned
+            #  2. last  floor(k/3) basis vectors are always assigned
+            #  3. remaining k-2*floor(k/3) basis vectors are selected
+            #     randomly from the remaining HH*WW-2*floor(k/3) possibilities
+            ind_1 = np.arange(dim//3)
+            ind_3 = np.arange(dim-(dim//3),dim)
+            ind_2 = np.arange(ind_1[-1]+1,ind_3[0])
+            basis_indices[ii,ind_1] = np.arange(dim//3).astype(int)
+            basis_indices[ii,ind_3] = np.arange(max_dim-(dim//3),max_dim)
+            perm_middle = np.random.permutation(np.arange(ind_2[0],max_dim-(dim//3)))
+            basis_indices[ii,ind_2] = perm_middle[:ind_2.shape[0]]
+            # --- old version ---
+            #indices = np.random.permutation(np.arange(dim//3,HH*WW - np.int(2*dim//3)))[:dim//3]
+            #basis_indices[ii,:dim//3] = (np.arange(dim//3)).astype(int)
+            #basis_indices[ii,dim//3:2*dim//3] = indices
+            #basis_indices[ii,2*dim//3:] = (np.arange(HH*WW - np.ceil(dim/3).astype(int),HH*WW)).astype(int)
 
         for t in range(num_iterations):
             self._step(HH,WW,basis_indices)
