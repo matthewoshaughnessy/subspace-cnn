@@ -45,9 +45,8 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
-
 net = Net()
-net.cuda()
+net = net.cuda()
 
 ### Define basis and basis indices for each conv layer ###########
 from Projection.basis_gen import *
