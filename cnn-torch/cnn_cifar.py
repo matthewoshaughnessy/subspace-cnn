@@ -103,12 +103,12 @@ for epoch in range(100):  # loop over the dataset multiple times
         loss.backward()
         optimizer.step()
         
-        #w1 = net.conv1.weight.data.cpu().numpy()
-        #w2 = net.conv2.weight.data.cpu().numpy()
-        #w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
-        #w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-        #net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
-        #net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
+        w1 = net.conv1.weight.data.cpu().numpy()
+        w2 = net.conv2.weight.data.cpu().numpy()
+        w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+        w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+        net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
+        net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
         
         #w1n = net.conv1.weight.data.numpy()
         #w2n = net.conv2.weight.data.numpy()
