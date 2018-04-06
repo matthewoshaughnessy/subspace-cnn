@@ -55,24 +55,18 @@ net = net.cuda()
 from Projection.basis_gen import *
 import scipy.fftpack
 
-# Conv1
+# conv1
 F1 = (net.conv1.weight).size()[0]
 H1 = (net.conv1.weight).size()[2]
 W1 = (net.conv1.weight).size()[3]
-print(F1,H1,W1)
-
 dim1 = np.int(0.5*H1*W1)
-
 basis_indices1 = gen_basis_indices(F1,H1,W1,dim1)
 
-# Conv2
+# conv2
 F2 = (net.conv2.weight).size()[0]
 H2 = (net.conv2.weight).size()[2]
 W2 = (net.conv2.weight).size()[3]
-print(F2,H2,W2)
-
 dim2 = np.int(0.5*H2*W2)
-
 basis_indices2 = gen_basis_indices(F2,H2,W2,dim2)
 
 # full basis
@@ -104,28 +98,23 @@ for epoch in range(100):  # loop over the dataset multiple times
         optimizer.zero_grad()
 
         # forward + backward + optimize
-        outputs = net(inputs)
+        outputs = net(inputs.cuda())
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
         
-        w1 = net.conv1.weight.data.cpu().numpy()
-        w2 = net.conv2.weight.data.cpu().numpy()
+        #w1 = net.conv1.weight.data.cpu().numpy()
+        #w2 = net.conv2.weight.data.cpu().numpy()
+        #w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+        #w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+        #net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
+        #net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
         
-        w1p  = (subspace_projection(dim1,w1,basis1,basis_indices1))
-        w2p  = (subspace_projection(dim2,w2,basis2,basis_indices2))
-    
-        
-        net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
-        net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
-        
-        w1n = net.conv1.weight.data.numpy()
-        w2n = net.conv2.weight.data.numpy()
-        
+        #w1n = net.conv1.weight.data.numpy()
+        #w2n = net.conv2.weight.data.numpy()
         #print(np.linalg.norm(w1 - w1n))
         #print(np.linalg.norm(w2 - w2n))
         
-      
         # print statistics
         running_loss += loss.data[0]
         if i % 2000 == 1999:    # print every 2000 mini-batches
