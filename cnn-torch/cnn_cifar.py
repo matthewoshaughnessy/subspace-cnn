@@ -96,7 +96,7 @@ for epoch in range(2):  # loop over the dataset multiple times
         inputs, labels = data
 
         # wrap them in Variable
-        inputs, labels = Variable(inputs), Variable(labels)
+        inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
 
         # zero the parameter gradients
         optimizer.zero_grad()
