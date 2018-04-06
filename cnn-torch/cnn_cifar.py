@@ -20,6 +20,9 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=4,
 classes = ('plane', 'car', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
+if torch.cuda.is_available():
+	torch.set_default_tensor_type('torch.cuda.FloatTensor')
+
 ### Define the CNN ###############################################
 
 from torch.autograd import Variable
