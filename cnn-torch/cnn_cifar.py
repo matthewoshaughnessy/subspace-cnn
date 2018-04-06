@@ -88,7 +88,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 from Projection.regularization import *
 
-for epoch in range(2):  # loop over the dataset multiple times
+for epoch in range(100):  # loop over the dataset multiple times
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
@@ -107,13 +107,10 @@ for epoch in range(2):  # loop over the dataset multiple times
         loss.backward()
         optimizer.step()
         
-        
-        
-        w1 = net.conv1.weight.data.numpy()
-        w2 = net.conv2.weight.data.numpy()
+        w1 = net.conv1.weight.data.cpu().numpy()
+        w2 = net.conv2.weight.data.cpu().numpy()
         
         w1p  = (subspace_projection(dim1,w1,basis1,basis_indices1))
-      
         w2p  = (subspace_projection(dim2,w2,basis2,basis_indices2))
     
         
