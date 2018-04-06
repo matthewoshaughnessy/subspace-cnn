@@ -3,8 +3,6 @@ import torchvision
 import torchvision.transforms as transforms
 #%matplotlib inline
 
-gpu_ids = [2]
-
 transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -49,7 +47,7 @@ class Net(nn.Module):
 
 
 net = Net()
-net.cuda(gpu_ids[0])
+net.cuda()
 
 ### Define basis and basis indices for each conv layer ###########
 from Projection.basis_gen import *
@@ -98,7 +96,7 @@ for epoch in range(100):  # loop over the dataset multiple times
         inputs, labels = data
 
         # wrap them in Variable
-        inputs, labels = Variable(inputs.cuda(gpu_ids[0])), Variable(labels.cuda(gpu_ids[0]))
+        inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
 
         # zero the parameter gradients
         optimizer.zero_grad()
