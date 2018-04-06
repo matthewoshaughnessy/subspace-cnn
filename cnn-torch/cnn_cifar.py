@@ -103,24 +103,23 @@ for epoch in range(100):  # loop over the dataset multiple times
         loss.backward()
         optimizer.step()
         
-        w1 = net.conv1.weight.data.cpu().numpy()
-        w2 = net.conv2.weight.data.cpu().numpy()
-        w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
-        w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-        net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
-        net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
-        
-        #w1n = net.conv1.weight.data.numpy()
-        #w2n = net.conv2.weight.data.numpy()
-        #print(np.linalg.norm(w1 - w1n))
-        #print(np.linalg.norm(w2 - w2n))
-        
         # print statistics
         running_loss += loss.data[0]
         if i % 2000 == 1999:    # print every 2000 mini-batches
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
+            
+            w1 = net.conv1.weight.data.cpu().numpy()
+        	w2 = net.conv2.weight.data.cpu().numpy()
+        	w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+        	w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+        	net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
+        	net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
+        	#w1n = net.conv1.weight.data.numpy()
+        	#w2n = net.conv2.weight.data.numpy()
+        	#print(np.linalg.norm(w1 - w1n))
+        	#print(np.linalg.norm(w2 - w2n))
 
 print('Finished Training')
 
