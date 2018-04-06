@@ -47,7 +47,7 @@ class Net(nn.Module):
 
 
 net = Net()
-net.cuda()
+net.cuda(device_id=2)
 
 ### Define basis and basis indices for each conv layer ###########
 from Projection.basis_gen import *
@@ -96,7 +96,7 @@ for epoch in range(100):  # loop over the dataset multiple times
         inputs, labels = data
 
         # wrap them in Variable
-        inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
+        inputs, labels = Variable(inputs.cuda(device_id=2)), Variable(labels.cuda(device_id=2))
 
         # zero the parameter gradients
         optimizer.zero_grad()
