@@ -21,7 +21,7 @@ classes = ('plane', 'car', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 if torch.cuda.is_available():
-	torch.set_default_tensor_type('torch.cuda.FloatTensor')
+    torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 ### Define the CNN ###############################################
 
@@ -70,8 +70,8 @@ dim2 = np.int(0.5*H2*W2)
 basis_indices2 = gen_basis_indices(F2,H2,W2,dim2)
 
 # full basis
-basis1 = scipy.fftpack.dct(np.eye(H1*W1),norm='ortho')  
-basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')    
+basis1 = scipy.fftpack.dct(np.eye(H1*W1),norm='ortho')
+basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 
 ### Define a Loss function and optimizer ################################
 
@@ -109,7 +109,7 @@ for epoch in range(100):  # loop over the dataset multiple times
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
-           	
+            
             w1 = net.conv1.weight.data.cpu().numpy()
             w2 = net.conv2.weight.data.cpu().numpy()
             w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
