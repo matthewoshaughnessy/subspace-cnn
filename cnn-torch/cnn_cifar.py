@@ -14,6 +14,15 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
 
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
+
+# To use noisy testing data, uncomment the next three lines, choose between 20dB and 25dB
+
+test_batch_noisy = unpickle('./data/cifar-10-batches-py/test_batch_20dB')
+
+features = np.reshape(test_batch_noisy,(10000,32,32,3),'F').astype('uint8')
+
+testset.test_data = features
+
 testloader = torch.utils.data.DataLoader(testset, batch_size=4,
                                          shuffle=False, num_workers=2)
 
@@ -144,7 +153,11 @@ print('Finished Training', file=open("output.txt","a"))
 # Verify that the weights lie in the subspace
 
 import scipy
-W1 = net.conv1.weight.data.numpy()
+if torch.cuda.is_available():
+    W1 = net.conv1.weight.data.cpu().numpy()
+else:
+    W1 = net.conv1.weight.data.numpy()
+
 print(W1.shape)
 basis = scipy.fftpack.dct(np.eye(25),norm='ortho')
 
@@ -167,19 +180,20 @@ coeff_fil_1_ch_3 = np.dot(basis.T,np.reshape(fil_1_ch_3,25,'F'))
 #plt.figure()
 #plt.plot(np.abs(coeff_fil_1_ch_3),'*-')
 
-outputs = net(Variable(images))
-_, predicted = torch.max(outputs.data, 1)
-
-print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
-                              for j in range(4)))
-print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
-                              for j in range(4)), file=open("output.txt","a"))
-
 correct = 0
 total = 0
 for data in testloader:
+    #images, labels = data
+    #outputs = net(Variable(images).cpu())
     images, labels = data
-    outputs = net(Variable(images))
+    if torch.cuda.is_available():
+        images,labels = Variable(images.cuda()), labels.cuda()
+    else:
+        images,labels = Variable(images), labels
+    if torch.cuda.is_available():
+        outputs = net(images.cuda())
+    else:
+        outputs = net(images)
     _, predicted = torch.max(outputs.data, 1)
     total += labels.size(0)
     correct += (predicted == labels).sum()
@@ -193,7 +207,14 @@ class_correct = list(0. for i in range(10))
 class_total = list(0. for i in range(10))
 for data in testloader:
     images, labels = data
-    outputs = net(Variable(images))
+    if torch.cuda.is_available():
+        images,labels = Variable(images.cuda()), labels.cuda()
+    else:
+        images,labels = Variable(images), labels
+    if torch.cuda.is_available():
+    	outputs = net(images.cuda())
+    else:
+        outputs = net(images)
     _, predicted = torch.max(outputs.data, 1)
     c = (predicted == labels).squeeze()
     for i in range(4):
