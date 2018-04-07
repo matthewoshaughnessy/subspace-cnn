@@ -148,6 +148,7 @@ if torch.cuda.is_available():
     W1 = net.conv1.weight.data.cpu().numpy()
 else:
     W1 = net.conv1.weight.data.numpy()
+
 print(W1.shape)
 basis = scipy.fftpack.dct(np.eye(25),norm='ortho')
 
@@ -169,14 +170,6 @@ coeff_fil_1_ch_3 = np.dot(basis.T,np.reshape(fil_1_ch_3,25,'F'))
 #plt.plot(np.abs(coeff_fil_1_ch_2),'*-')
 #plt.figure()
 #plt.plot(np.abs(coeff_fil_1_ch_3),'*-')
-
-outputs = net(Variable(images))
-_, predicted = torch.max(outputs.data, 1)
-
-print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
-                              for j in range(4)))
-print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
-                              for j in range(4)), file=open("output.txt","a"))
 
 correct = 0
 total = 0

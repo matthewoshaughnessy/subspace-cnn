@@ -171,14 +171,6 @@ coeff_fil_1_ch_3 = np.dot(basis.T,np.reshape(fil_1_ch_3,25,'F'))
 #plt.figure()
 #plt.plot(np.abs(coeff_fil_1_ch_3),'*-')
 
-outputs = net(Variable(images))
-_, predicted = torch.max(outputs.data, 1)
-
-print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
-                              for j in range(4)))
-print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
-                              for j in range(4)), file=open("output.txt","a"))
-
 correct = 0
 total = 0
 for data in testloader:
