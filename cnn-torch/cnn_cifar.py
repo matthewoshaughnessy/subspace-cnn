@@ -9,6 +9,23 @@ transform = transforms.Compose(
 
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
+
+reducedData = True
+
+if reducedData:
+    factor = 0.4
+    data_filename = './data/cifar-10-batches-py/data_batch_' + str(factor)
+    label_filename = './data/cifar-10-batches-py/label_'+str(factor)
+
+    train_batch_reduced = unpickle(data_filename)
+
+    features = np.reshape(train_batch_reduced,(int(factor*50000),32,32,3),'F').astype('uint8')
+    trainset.train_data = features
+
+    labels = unpickle(label_filename)
+    trainset.train_labels = labels
+
+
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
                                           shuffle=True, num_workers=2)
 
