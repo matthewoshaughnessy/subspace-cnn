@@ -18,27 +18,42 @@ import torch.optim as optim
 from Projection.regularization import *
 import time
 
+### parameters ###################################################
+nEpochs = 30
+outputFile = 'experiment1_out.txt'
+outputMat = 'experiment1_out.mat'
+subspaceProject = False
+noisyData = True
+
+### helper functions #############################################
+def unpickle(file):
+   import pickle
+   with open(file, 'rb') as fo:
+       dict = pickle.load(fo, encoding='bytes')
+   return dict
+
 transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
+# get training data
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
                                           shuffle=True, num_workers=2)
 
+# get (potentially noisy) test data
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
+if noisyData:
+    test_batch_noisy = unpickle('./data/cifar-10-batches-py/test_batch_20dB')
+    features = np.reshape(test_batch_noisy,(10000,32,32,3),'F').astype('uint8')
+    testset.test_data = features
 testloader = torch.utils.data.DataLoader(testset, batch_size=4,
                                          shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-
-nEpochs = 30
-outputFile = 'experiment1_out.txt'
-outputMat = 'experiment1_out.mat'
-subspaceProject = False
 
 nClasses = len(classes)
 
