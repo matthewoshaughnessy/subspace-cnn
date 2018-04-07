@@ -146,7 +146,7 @@ print('Finished Training', file=open("output.txt","a"))
 import scipy
 if torch.cuda.is_available():
     W1 = net.conv1.weight.data.cpu().numpy()
-else
+else:
     W1 = net.conv1.weight.data.numpy()
 print(W1.shape)
 basis = scipy.fftpack.dct(np.eye(25),norm='ortho')
