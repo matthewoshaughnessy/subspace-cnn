@@ -1,59 +1,66 @@
+##################################################################
+### Experiment 3: Test subspace constraints on pretrained model ##
+##################################################################
+
+import numpy as np
+import scipy
+import scipy.io as sio
+import time
+import pickle
+
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
-#%matplotlib inline
+import torchvision.models
+from torch.autograd import Variable
+
+### parameters ###################################################
+nEpochs = 30
+outputFile = 'experiment1_out.txt'
+outputMat = 'experiment1_out.mat'
+subspaceProject = False
+
+### helper functions #############################################
+def unpickle(file):
+   import pickle
+   with open(file, 'rb') as fo:
+       dict = pickle.load(fo, encoding='bytes')
+   return dict
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
+# get training data
+trainset = torchvision.datasets.
+
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
-
-reducedData = True
-
-if reducedData:
-    factor = 0.4
-    data_filename = './data/cifar-10-batches-py/data_batch_' + str(factor)
-    label_filename = './data/cifar-10-batches-py/label_'+str(factor)
-
-    train_batch_reduced = unpickle(data_filename)
-
-    features = np.reshape(train_batch_reduced,(int(factor*50000),32,32,3),'F').astype('uint8')
-    trainset.train_data = features
-
-    labels = unpickle(label_filename)
-    trainset.train_labels = labels
-
-
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
                                           shuffle=True, num_workers=2)
 
+# get (potentially noisy) test data
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
-
-# To use noisy testing data, uncomment the next three lines, choose between 20dB and 25dB
-
-test_batch_noisy = unpickle('./data/cifar-10-batches-py/test_batch_20dB')
-
-features = np.reshape(test_batch_noisy,(10000,32,32,3),'F').astype('uint8')
-
-testset.test_data = features
-
+if noisyData:
+    test_batch_noisy = unpickle('./data/cifar-10-batches-py/test_batch_20dB')
+    features = np.reshape(test_batch_noisy,(10000,32,32,3),'F').astype('uint8')
+    testset.test_data = features
 testloader = torch.utils.data.DataLoader(testset, batch_size=4,
                                          shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat',
            'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
+nClasses = len(classes)
+
 if torch.cuda.is_available():
     torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 ### Define the CNN ###############################################
-
-from torch.autograd import Variable
-import torch.nn as nn
-import torch.nn.functional as F
 
 class Net(nn.Module):
     def __init__(self):
@@ -63,7 +70,7 @@ class Net(nn.Module):
         self.conv2 = nn.Conv2d(6, 16, 5)
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
+        self.fc3 = nn.Linear(84, nClasses)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
@@ -79,8 +86,6 @@ if torch.cuda.is_available():
     net = net.cuda()
 
 ### Define basis and basis indices for each conv layer ###########
-from Projection.basis_gen import *
-import scipy.fftpack
 
 # conv1
 F1 = (net.conv1.weight).size()[0]
@@ -102,16 +107,19 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 
 ### Define a Loss function and optimizer ################################
 
-import torch.optim as optim
-
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 #### Train the network #################################################
 
-from Projection.regularization import *
+# debug data
+loss_history = np.zeros((len(trainloader),nEpochs))
+testaccuracy_history = np.zeros((nEpochs,1))
+time_history = np.zeros((nEpochs+1,1))
+time_history[0] = time.time();
 
-for epoch in range(1):  # loop over the dataset multiple times
+# train
+for epoch in range(nEpochs):  # loop over the dataset multiple times
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
@@ -136,55 +144,68 @@ for epoch in range(1):  # loop over the dataset multiple times
         loss.backward()
         optimizer.step()
         
-        # print statistics
+        # save debug data
+        loss_history[i,epoch] = loss.data[0]
+        time_history[epoch+1] = time.time()
+
+        # print debug data
         running_loss += loss.data[0]
-        if i % 2000 == 1999:    # print every 2000 mini-batches
+        if i % 500 == 499:    # print every 2000 mini-batches
             print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
+                  (epoch + 1, i + 1, running_loss / 500))
             print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000), file=open("output.txt","a"))
+                  (epoch + 1, i + 1, running_loss / 500), file=open(outputFile,"a"))
             running_loss = 0.0
-            
-            if torch.cuda.is_available():
-                w1 = net.conv1.weight.data.cpu().numpy()
-                w2 = net.conv2.weight.data.cpu().numpy()
-                w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
-                w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-                net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
-                net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
-            else:
-                w1 = net.conv1.weight.data.numpy()
-                w2 = net.conv2.weight.data.numpy()
-                w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
-                w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-                net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
-                net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
+
+            # project weights
+            if subspaceProject:
+                if torch.cuda.is_available():
+                    w1 = net.conv1.weight.data.cpu().numpy()
+                    w2 = net.conv2.weight.data.cpu().numpy()
+                    w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+                    w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+                    net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
+                    net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
+                else:
+                    w1 = net.conv1.weight.data.numpy()
+                    w2 = net.conv2.weight.data.numpy()
+                    w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+                    w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+                    net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
+                    net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
             #w1n = net.conv1.weight.data.numpy()
             #w2n = net.conv2.weight.data.numpy()
             #print(np.linalg.norm(w1 - w1n))
             #print(np.linalg.norm(w2 - w2n))
 
+    # record accuracy on test set
+    correct = 0.0
+    total = 0.0
+    for data in testloader:
+        images, labels = data
+        outputs = net(Variable(images))
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum()
+    testaccuracy_history[epoch] = correct / total
+    print('--> Accuracy after epoch %d: %d %%' % (epoch, 100 * correct / total))
+    print('--> Accuracy after epoch %d: %d %%' % (epoch, 100 * correct / total), file=open(outputFile,'a'))
+
 print('Finished Training')
-print('Finished Training', file=open("output.txt","a"))
+print('Finished Training', file=open(outputFile,"a"))
 
 # Verify that the weights lie in the subspace
 
-import scipy
 if torch.cuda.is_available():
     W1 = net.conv1.weight.data.cpu().numpy()
 else:
     W1 = net.conv1.weight.data.numpy()
-
-print(W1.shape)
 basis = scipy.fftpack.dct(np.eye(25),norm='ortho')
 
 fil_1 = W1[4,:,:,:]
 fil_1_ch_1 = fil_1[0,:,:]
 fil_1_ch_2 = fil_1[1,:,:]
 fil_1_ch_3 = fil_1[2,:,:]
-
-
-print(fil_1_ch_1.shape)
 
 coeff_fil_1_ch_1 = np.dot(basis.T,np.reshape(fil_1_ch_1,25,'F'))
 coeff_fil_1_ch_2 = np.dot(basis.T,np.reshape(fil_1_ch_2,25,'F'))
@@ -200,17 +221,8 @@ coeff_fil_1_ch_3 = np.dot(basis.T,np.reshape(fil_1_ch_3,25,'F'))
 correct = 0
 total = 0
 for data in testloader:
-    #images, labels = data
-    #outputs = net(Variable(images).cpu())
     images, labels = data
-    if torch.cuda.is_available():
-        images,labels = Variable(images.cuda()), labels.cuda()
-    else:
-        images,labels = Variable(images), labels
-    if torch.cuda.is_available():
-        outputs = net(images.cuda())
-    else:
-        outputs = net(images)
+    outputs = net(Variable(images))
     _, predicted = torch.max(outputs.data, 1)
     total += labels.size(0)
     correct += (predicted == labels).sum()
@@ -218,20 +230,13 @@ for data in testloader:
 print('Accuracy of the network on the 10000 test images: %d %%' % (
     100 * correct / total))
 print('Accuracy of the network on the 10000 test images: %d %%' % (
-    100 * correct / total), file=open("output.txt","a"))
+    100 * correct / total), file=open(outputFile,"a"))
 
-class_correct = list(0. for i in range(10))
-class_total = list(0. for i in range(10))
+class_correct = list(0. for i in range(nClasses))
+class_total = list(0. for i in range(nClasses))
 for data in testloader:
     images, labels = data
-    if torch.cuda.is_available():
-        images,labels = Variable(images.cuda()), labels.cuda()
-    else:
-        images,labels = Variable(images), labels
-    if torch.cuda.is_available():
-    	outputs = net(images.cuda())
-    else:
-        outputs = net(images)
+    outputs = net(Variable(images))
     _, predicted = torch.max(outputs.data, 1)
     c = (predicted == labels).squeeze()
     for i in range(4):
@@ -239,9 +244,24 @@ for data in testloader:
         class_correct[label] += c[i]
         class_total[label] += 1
 
-for i in range(10):
+for i in range(nClasses):
     print('Accuracy of %5s : %2d %%' % (
         classes[i], 100 * class_correct[i] / class_total[i]))
     print('Accuracy of %5s : %2d %%' % (
-        classes[i], 100 * class_correct[i] / class_total[i]), file=open("output.txt","a"))
+        classes[i], 100 * class_correct[i] / class_total[i]), file=open(outputFile,"a"))
+
+print('Saving data to mat file...')
+print('Saving data to mat file...', file=open(outputFile,'a'))
+sio.savemat(outputMat,{
+    'loss_history' : loss_history,
+    'testaccuracy_history' : testaccuracy_history,
+    'time_history' : time_history,
+    'class_correct' : class_correct,
+    'class_total' : class_total,
+    'coeff_1' : coeff_fil_1_ch_1,
+    'coeff_2' : coeff_fil_1_ch_2,
+    'coeff_3' : coeff_fil_1_ch_3})
+print('done!')
+print('done!', file=open(outputFile,'a'))
+
 
