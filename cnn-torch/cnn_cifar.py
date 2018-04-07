@@ -178,9 +178,9 @@ for data in testloader:
     #outputs = net(Variable(images).cpu())
     images, labels = data
     if torch.cuda.is_available():
-        images,labels = Variable(images.cuda()), Variable(labels.cuda())
+        images,labels = Variable(images.cuda()), labels.cuda()
     else:
-        images,labels = Variable(images), Variable(labels)
+        images,labels = Variable(images), labels
     if torch.cuda.is_available():
         outputs = net(images.cuda())
     else:
@@ -199,9 +199,9 @@ class_total = list(0. for i in range(10))
 for data in testloader:
     images, labels = data
     if torch.cuda.is_available():
-        images,labels = Variable(images.cuda()), Variable(labels.cuda())
+        images,labels = Variable(images.cuda()), labels.cuda()
     else:
-        images,labels = Variable(images), Variable(labels)
+        images,labels = Variable(images), labels
     if torch.cuda.is_available():
     	outputs = net(images.cuda())
     else:
