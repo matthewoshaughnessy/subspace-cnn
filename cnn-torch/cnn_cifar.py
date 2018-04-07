@@ -49,7 +49,8 @@ class Net(nn.Module):
         return x
 
 net = Net()
-net = net.cuda()
+if torch.cuda.is_available():
+    net = net.cuda()
 
 ### Define basis and basis indices for each conv layer ###########
 from Projection.basis_gen import *
@@ -92,13 +93,19 @@ for epoch in range(100):  # loop over the dataset multiple times
         inputs, labels = data
 
         # wrap them in Variable
-        inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
+        if torch.cuda.is_available():
+            inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
+        else:
+            inputs, labels = Variable(inputs), Variable(labels)
 
         # zero the parameter gradients
         optimizer.zero_grad()
 
         # forward + backward + optimize
-        outputs = net(inputs.cuda())
+        if torch.cuda.is_available():
+            outputs = net(inputs.cuda())
+        else:
+            outputs = net(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
@@ -108,20 +115,31 @@ for epoch in range(100):  # loop over the dataset multiple times
         if i % 2000 == 1999:    # print every 2000 mini-batches
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 2000))
+            print('[%d, %5d] loss: %.3f' %
+                  (epoch + 1, i + 1, running_loss / 2000), file=open("output.txt","a"))
             running_loss = 0.0
             
-            w1 = net.conv1.weight.data.cpu().numpy()
-            w2 = net.conv2.weight.data.cpu().numpy()
-            w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
-            w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-            net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
-            net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
+            if torch.cuda.is_available():
+                w1 = net.conv1.weight.data.cpu().numpy()
+                w2 = net.conv2.weight.data.cpu().numpy()
+                w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+                w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+                net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
+                net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
+            else:
+                w1 = net.conv1.weight.data.numpy()
+                w2 = net.conv2.weight.data.numpy()
+                w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+                w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+                net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
+                net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
             #w1n = net.conv1.weight.data.numpy()
             #w2n = net.conv2.weight.data.numpy()
             #print(np.linalg.norm(w1 - w1n))
             #print(np.linalg.norm(w2 - w2n))
 
 print('Finished Training')
+print('Finished Training', file=open("output.txt","a"))
 
 # Verify that the weights lie in the subspace
 
@@ -154,6 +172,8 @@ _, predicted = torch.max(outputs.data, 1)
 
 print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
                               for j in range(4)))
+print('Predicted: ', ' '.join('%5s' % classes[predicted[j]]
+                              for j in range(4)), file=open("output.txt","a"))
 
 correct = 0
 total = 0
@@ -166,6 +186,8 @@ for data in testloader:
 
 print('Accuracy of the network on the 10000 test images: %d %%' % (
     100 * correct / total))
+print('Accuracy of the network on the 10000 test images: %d %%' % (
+    100 * correct / total), file=open("output.txt","a"))
 
 class_correct = list(0. for i in range(10))
 class_total = list(0. for i in range(10))
@@ -182,4 +204,6 @@ for data in testloader:
 for i in range(10):
     print('Accuracy of %5s : %2d %%' % (
         classes[i], 100 * class_correct[i] / class_total[i]))
+    print('Accuracy of %5s : %2d %%' % (
+        classes[i], 100 * class_correct[i] / class_total[i]), file=open("output.txt","a"))
 
