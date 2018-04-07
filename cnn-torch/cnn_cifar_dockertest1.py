@@ -174,8 +174,17 @@ coeff_fil_1_ch_3 = np.dot(basis.T,np.reshape(fil_1_ch_3,25,'F'))
 correct = 0
 total = 0
 for data in testloader:
+    #images, labels = data
+    #outputs = net(Variable(images).cpu())
     images, labels = data
-    outputs = net(Variable(images).cpu())
+    if torch.cuda.is_available():
+        images,labels = Variable(images.cuda()), Variable(labels.cuda())
+    else:
+        images,labels = Variable(images), Variable(labels)
+    if torch.cuda.is_available():
+        outputs = net(images.cuda())
+    else:
+        outputs = net(images)
     _, predicted = torch.max(outputs.data, 1)
     total += labels.size(0)
     correct += (predicted == labels).sum()
@@ -189,7 +198,14 @@ class_correct = list(0. for i in range(10))
 class_total = list(0. for i in range(10))
 for data in testloader:
     images, labels = data
-    outputs = net(Variable(images).cpu())
+    if torch.cuda.is_available():
+        images,labels = Variable(images.cuda()), Variable(labels.cuda())
+    else:
+        images,labels = Variable(images), Variable(labels)
+    if torch.cuda.is_available():
+    	outputs = net(images.cuda())
+    else:
+        outputs = net(images)
     _, predicted = torch.max(outputs.data, 1)
     c = (predicted == labels).squeeze()
     for i in range(4):
