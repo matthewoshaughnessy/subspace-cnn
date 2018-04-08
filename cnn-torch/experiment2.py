@@ -28,19 +28,20 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 3
-outputFile = 'experiment1_out.txt'
-outputMat = 'experiment1_out.mat'
+nEpochs = 30
+outputFile = 'experiment2_out.txt'
+outputMat = 'experiment2_out.mat'
 subspaceProject = False
 if len(sys.argv) > 1 and (sys.argv[1].lower() == 'true'):
     subspaceProject = True
 noisyData = False
 if len(sys.argv) > 2 and (sys.argv[2].lower() == 'true'):
     noisyData = True
-reducedData = True
+reducedData = False
 if len(sys.argv) > 3 and (sys.argv[3].lower() == 'true'):
     reducedData = True
-
+if len(sys.argv) > 4:
+    factor = sys.argv[4]
     
 
 ### helper functions #############################################
@@ -80,7 +81,7 @@ trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
 
 
 if reducedData:
-    factor = 0.6
+    print('% of training data used: '+str(factor))
     data_filename = './data/cifar-10-batches-py/data_batch_'+str(factor)
     labels_filename = './data/cifar-10-batches-py/label_'+str(factor)
     train_data_batch = unpickle(data_filename)
