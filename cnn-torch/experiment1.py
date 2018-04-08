@@ -20,7 +20,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 30
+nEpochs = 100
 outputFile = 'experiment1_out.txt'
 outputMat = 'experiment1_out.mat'
 subspaceProject = False
