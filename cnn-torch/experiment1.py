@@ -16,6 +16,7 @@ import scipy.io as sio
 from Projection.basis_gen import *
 import torch.optim as optim
 from Projection.regularization import *
+import sys
 import time
 
 ### parameters ###################################################
@@ -23,7 +24,11 @@ nEpochs = 30
 outputFile = 'experiment1_out.txt'
 outputMat = 'experiment1_out.mat'
 subspaceProject = False
-noisyData = True
+if len(sys.argv) > 1 and (sys.argv[1].lower() == 'true'):
+    subspaceProject = True
+noisyData = False
+if len(sys.argv) > 2 and (sys.argv[2].lower() == 'true'):
+    noisyData = True
 
 ### helper functions #############################################
 def unpickle(file):
@@ -31,6 +36,20 @@ def unpickle(file):
    with open(file, 'rb') as fo:
        dict = pickle.load(fo, encoding='bytes')
    return dict
+
+# print selected options
+if subspaceProject:
+    print('Subspace projection ON')
+    print('Subspace projection ON', file=open(outputFile,'a'))
+else:
+    print('Subspace projection OFF')
+    print('Subspace projection OFF', file=open(outputFile,'a'))
+if noisyData:
+    print('Noisy test set ON')
+    print('Noisy test set ON', file=open(outputFile,'a'))
+else:
+    print('Noisy test set OFF')
+    print('Noisy test set OFF', file=open(outputFile,'a'))    
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
