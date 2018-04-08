@@ -66,7 +66,8 @@ testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
 if noisyData:
     test_batch_noisy = unpickle('./data/cifar-10-batches-py/test_batch_20dB')
-    features = np.reshape(test_batch_noisy,(10000,32,32,3),'F').astype('uint8')
+    features = np.reshape(test_batch_noisy,(10000,3,32,32)).astype('uint8')
+    features = np.transpose(features,(0,2,3,1))
     testset.test_data = features
 testloader = torch.utils.data.DataLoader(testset, batch_size=4,
                                          shuffle=False, num_workers=2)
