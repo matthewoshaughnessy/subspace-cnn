@@ -86,6 +86,7 @@ def main():
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
+    print('Making train_loader...')
     train_loader = torch.utils.data.DataLoader(
         datasets.CIFAR10(root='./data', train=True, transform=transforms.Compose([
             transforms.RandomHorizontalFlip(),
@@ -96,6 +97,7 @@ def main():
         batch_size=args.batch_size, shuffle=True,
         num_workers=args.workers, pin_memory=True)
 
+    print('Making val_loader...')
     val_loader = torch.utils.data.DataLoader(
         datasets.CIFAR10(root='./data', train=False, transform=transforms.Compose([
             transforms.ToTensor(),
@@ -111,6 +113,7 @@ def main():
         model.half()
         criterion.half()
 
+    print('Making optimizer...')
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
@@ -125,6 +128,7 @@ def main():
             param_group['lr'] = args.lr*0.1
 
     if args.evaluate:
+        print('Evaluating...')
         validate(val_loader, model, criterion)
         return
 
@@ -218,10 +222,13 @@ def validate(val_loader, model, criterion):
     top1 = AverageMeter()
 
     # switch to evaluate mode
+    print('Switching to evaluate mode...')
     model.eval()
 
     end = time.time()
+    print('About to validate...')
     for i, (input, target) in enumerate(val_loader):
+        print('Using validation example %d' % (i))
         target = target.cuda(async=True)
         input_var = torch.autograd.Variable(input, volatile=True).cuda()
         target_var = torch.autograd.Variable(target, volatile=True)
