@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
+from . import lr_scheduler
 import torch.utils.data
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
