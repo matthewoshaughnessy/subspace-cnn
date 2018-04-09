@@ -60,16 +60,19 @@ def main():
     global args, best_prec1
     args = parser.parse_args()
 
-
     # Check the save_dir exists or not
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
 
+    print('creating model...')
     model = torch.nn.DataParallel(resnet.__dict__[args.arch]())
     model.cuda()
+    print('done.')
 
     # optionally resume from a checkpoint
+    print('checking if resume was specified')
     if args.resume:
+        print('resume specified; checking if %s is valid' % (args.resume))
         if os.path.isfile(args.resume):
             print("=> loading checkpoint '{}'".format(args.resume))
             checkpoint = torch.load(args.resume)
