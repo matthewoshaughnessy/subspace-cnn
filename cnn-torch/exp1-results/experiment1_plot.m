@@ -1,12 +1,12 @@
 % --- parameters ---
-ma_filt_length = 200;
+ma_filt_length = 1000;
 col = cbrewer('qual','Paired',8);
 
 
 % --- load data ---
 variants = {'noproj_nonoise','noproj_noise','proj_nonoise','proj_noise'};
 for i = 1:length(variants)
-  filename = ['experiment1_out_' variants{i} '.mat'];
+  filename = ['exp1_' variants{i} '.mat'];
   load(filename);
   eval([variants{i} ' = struct(' ...
     '''loss_history'',loss_history,' ...

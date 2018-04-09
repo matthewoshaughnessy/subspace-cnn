@@ -20,14 +20,15 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 30
-outputFile = 'experiment1_out.txt'
-outputMat = 'experiment1_out.mat'
+nEpochs = 200
+outputName = sys.argv[1]
+outputFile = outputName + ".txt"
+outputMat = outputName + ".mat"
 subspaceProject = False
-if len(sys.argv) > 1 and (sys.argv[1].lower() == 'true'):
+if len(sys.argv) > 2 and (sys.argv[2].lower() == 'true'):
     subspaceProject = True
 noisyData = False
-if len(sys.argv) > 2 and (sys.argv[2].lower() == 'true'):
+if len(sys.argv) > 3 and (sys.argv[3].lower() == 'true'):
     noisyData = True
 
 ### helper functions #############################################
@@ -38,6 +39,9 @@ def unpickle(file):
    return dict
 
 # print selected options
+print("Output name: %s" % (outputName))
+print('Outputting debug data to: %s' % (outputFile))
+print('Outputting matlab data to: %s' % (outputMat))
 if subspaceProject:
     print('Subspace projection ON')
     print('Subspace projection ON', file=open(outputFile,'a'))
