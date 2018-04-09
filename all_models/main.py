@@ -61,7 +61,7 @@ if args.resume:
 else:
     print('==> Building model..')
     # net = VGG('VGG19')
-    net = resnet.ResNet18()
+    net = models.resnet.ResNet18()
     # net = PreActResNet18()
     # net = GoogLeNet()
     # net = DenseNet121()
