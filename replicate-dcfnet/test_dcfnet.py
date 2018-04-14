@@ -85,7 +85,7 @@ class Net(nn.Module):
         self.fc2 = nn.Linear(512, nClasses)
 
     def forward(self, x):
-        print(x.shape)
+        print(x.cpu().shape)
         x = F.relu(self.conv1(x))
         print(x.shape)
         x = self.pool(x)
