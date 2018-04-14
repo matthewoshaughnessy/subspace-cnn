@@ -202,8 +202,8 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     # record accuracy on test set
     correct = 0.0
     total = 0.0
+    #net.cpu()
     for data in testloader:
-        net.cpu()
         images, labels = data
         outputs = net(Variable(images))
         _, predicted = torch.max(outputs.data, 1)
