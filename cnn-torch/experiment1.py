@@ -174,7 +174,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         # print debug data
         running_loss += loss.data[0]
-        if i % 500 == 499:    # print every 2000 mini-batches
+        if i % 50 == 49:    # print every 2000 mini-batches
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 500))
             print('[%d, %5d] loss: %.3f' %
