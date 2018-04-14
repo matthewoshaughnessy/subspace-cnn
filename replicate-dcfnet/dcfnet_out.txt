@@ -2970,3 +2970,84 @@ Epoch 1: lr = 0.001000
 Epoch 2: lr = 0.001000
 [3,   100] loss: 1.828
 [3,   200] loss: 1.814
+[3,   300] loss: 1.839
+[3,   400] loss: 1.794
+[3,   500] loss: 1.782
+[3,   600] loss: 1.800
+[3,   700] loss: 1.780
+--> Accuracy after epoch 2: 38 %
+Epoch 3: lr = 0.001000
+[4,   100] loss: 1.761
+[4,   200] loss: 1.771
+[4,   300] loss: 1.761
+[4,   400] loss: 1.774
+[4,   500] loss: 1.751
+[4,   600] loss: 1.756
+[4,   700] loss: 1.737
+--> Accuracy after epoch 3: 39 %
+Epoch 4: lr = 0.001000
+[5,   100] loss: 1.725
+[5,   200] loss: 1.730
+[5,   300] loss: 1.721
+[5,   400] loss: 1.721
+[5,   500] loss: 1.708
+[5,   600] loss: 1.715
+[5,   700] loss: 1.737
+--> Accuracy after epoch 4: 41 %
+Epoch 5: lr = 0.001000
+[6,   100] loss: 1.672
+[6,   200] loss: 1.700
+[6,   300] loss: 1.698
+[6,   400] loss: 1.701
+[6,   500] loss: 1.696
+[6,   600] loss: 1.715
+[6,   700] loss: 1.694
+--> Accuracy after epoch 5: 40 %
+Epoch 6: lr = 0.001000
+[7,   100] loss: 1.682
+[7,   200] loss: 1.669
+[7,   300] loss: 1.689
+[7,   400] loss: 1.668
+[7,   500] loss: 1.687
+[7,   600] loss: 1.658
+[7,   700] loss: 1.684
+--> Accuracy after epoch 6: 42 %
+Epoch 7: lr = 0.001000
+[8,   100] loss: 1.667
+[8,   200] loss: 1.667
+[8,   300] loss: 1.655
+[8,   400] loss: 1.643
+[8,   500] loss: 1.632
+[8,   600] loss: 1.643
+[8,   700] loss: 1.683
+--> Accuracy after epoch 7: 41 %
+Epoch 8: lr = 0.001000
+[9,   100] loss: 1.618
+[9,   200] loss: 1.611
+[9,   300] loss: 1.637
+[9,   400] loss: 1.633
+[9,   500] loss: 1.639
+[9,   600] loss: 1.650
+[9,   700] loss: 1.671
+--> Accuracy after epoch 8: 42 %
+Epoch 9: lr = 0.001000
+[10,   100] loss: 1.617
+[10,   200] loss: 1.609
+[10,   300] loss: 1.622
+[10,   400] loss: 1.641
+[10,   500] loss: 1.620
+[10,   600] loss: 1.620
+[10,   700] loss: 1.623
+--> Accuracy after epoch 9: 42 %
+Epoch 10: lr = 0.001000
+Output name: dcfnet_out
+Outputting debug data to: dcfnet_out.txt
+Outputting matlab data to: dcfnet_out.mat
+Subspace projection ON
+Epoch 0: lr = 0.000100
+[1,   100] loss: 2.288
+[1,   200] loss: 2.247
+[1,   300] loss: 2.213
+[1,   400] loss: 2.174
+[1,   500] loss: 2.153
+[1,   600] loss: 2.128

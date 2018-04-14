@@ -119,8 +119,8 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 
 criterion = nn.CrossEntropyLoss()
 #optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
-optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+optimizer = torch.optim.Adam(net.parameters(), lr=1e-4)
+#scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
 #### Train the network #################################################
 
@@ -134,7 +134,7 @@ time_history[0] = time.time();
 for epoch in range(nEpochs):  # loop over the dataset multiple times
 
     running_loss = 0.0
-    scheduler.step()
+    #scheduler.step()
     printlog( 'Epoch %d: lr = %f' % (epoch, optimizer.param_groups[0]['lr']), outputFile)
 
     for i, data in enumerate(trainloader, 0):
