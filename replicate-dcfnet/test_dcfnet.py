@@ -124,7 +124,7 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 
 criterion = nn.CrossEntropyLoss()
 #optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-optimizer = torch.optim.Adam(net.parameters(), lr=1e-4)
+optimizer = torch.optim.Adam(net.parameters(), lr=1e-5)
 #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
 #### Train the network #################################################
