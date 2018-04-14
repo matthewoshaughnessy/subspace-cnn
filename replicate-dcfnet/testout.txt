@@ -1,0 +1,10 @@
+Output name: testout
+Outputting debug data to: testout.txt
+Outputting matlab data to: testout.mat
+Subspace projection OFF
+Epoch 0: lr = 0.001000
+Output name: testout
+Outputting debug data to: testout.txt
+Outputting matlab data to: testout.mat
+Subspace projection OFF
+Epoch 0: lr = 0.001000
