@@ -195,7 +195,9 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     correct = 0.0
     total = 0.0
     for data in testloader:
-        images, labels = data.cpu()
+        images, labels = data
+        images = images.cpu()
+        labels = labels.cpu()
         outputs = net(Variable(images))
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
