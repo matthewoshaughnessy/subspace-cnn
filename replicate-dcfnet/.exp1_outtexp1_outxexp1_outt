@@ -1,0 +1,17 @@
+Subspace projection ON
+Noisy test set ON
+[1,   500] loss: 2.304
+[1,  1000] loss: 2.288
+[1,  1500] loss: 2.165
+[1,  2000] loss: 2.056
+[1,  2500] loss: 1.989
+[1,  3000] loss: 1.890
+[1,  3500] loss: 1.880
+[1,  4000] loss: 1.795
+[1,  4500] loss: 1.745
+[1,  5000] loss: 1.741
+Subspace projection ON
+Noisy test set ON
+[1,   500] loss: 2.303
+Subspace projection ON
+Noisy test set ON
