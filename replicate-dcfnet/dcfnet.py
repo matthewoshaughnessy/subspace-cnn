@@ -208,9 +208,9 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         inputs, labels = data
         if torch.cuda.is_available():
-            inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
+            inputs, labels = Variable(inputs.cuda()), labels.cuda()
         else:
-            inputs, labels = Variable(inputs), Variable(labels)
+            inputs, labels = Variable(inputs), labels
 
         outputs = net(inputs)
         _, predicted = torch.max(outputs.data, 1)
