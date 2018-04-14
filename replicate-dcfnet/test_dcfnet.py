@@ -198,7 +198,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
         images, labels = data
         images = images.cpu()
         labels = labels.cpu()
-        outputs = net(images)
+        outputs = net(Variable(images))
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum()
