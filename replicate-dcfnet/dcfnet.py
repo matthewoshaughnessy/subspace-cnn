@@ -212,7 +212,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
         else:
             inputs, labels = Variable(inputs), Variable(labels)
 
-        outputs = net(Variable(images))
+        outputs = net(Variable(inputs))
         _, predicted = torch.max(outputs.data, 1)
 
         total += labels.size(0)
