@@ -146,6 +146,7 @@ time_history[0] = time.time();
 # train
 for epoch in range(nEpochs):  # loop over the dataset multiple times
 
+    net.cuda(0)
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         # get the inputs
