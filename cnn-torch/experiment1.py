@@ -62,7 +62,7 @@ transform = transforms.Compose(
 # get training data
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=128,
                                           shuffle=True, num_workers=2)
 
 # get (potentially noisy) test data
@@ -73,7 +73,7 @@ if noisyData:
     features = np.reshape(test_batch_noisy,(10000,3,32,32)).astype('uint8')
     features = np.transpose(features,(0,2,3,1))
     testset.test_data = features
-testloader = torch.utils.data.DataLoader(testset, batch_size=4,
+testloader = torch.utils.data.DataLoader(testset, batch_size=128,
                                          shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat',
