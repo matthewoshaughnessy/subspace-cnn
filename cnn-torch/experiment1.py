@@ -20,7 +20,6 @@ import sys
 import time
 
 ### parameters ###################################################
-gpus = [0]
 nEpochs = 200
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
@@ -84,6 +83,7 @@ nClasses = len(classes)
 
 if torch.cuda.is_available():
     torch.set_default_tensor_type('torch.cuda.FloatTensor')
+    torch.cuda.set_device(0)
 
 ### Define the CNN ###############################################
 
@@ -108,7 +108,7 @@ class Net(nn.Module):
 
 net = Net()
 if torch.cuda.is_available():
-    net = net.cuda(device=gpus[0])
+    net = net.cuda()
 
 ### Define basis and basis indices for each conv layer ###########
 
@@ -153,7 +153,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         # wrap them in Variable
         if torch.cuda.is_available():
-            inputs, labels = Variable(inputs.cuda(device=gpus[0])), Variable(labels.cuda(device=gpus[0]))
+            inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
         else:
             inputs, labels = Variable(inputs), Variable(labels)
 
@@ -162,7 +162,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         # forward + backward + optimize
         if torch.cuda.is_available():
-            outputs = net(inputs.cuda(device=gpus[0]))
+            outputs = net(inputs.cuda())
         else:
             outputs = net(inputs)
         loss = criterion(outputs, labels)
@@ -189,8 +189,8 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
                     w2 = net.conv2.weight.data.cpu().numpy()
                     w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
                     w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-                    net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda(device=gpus[0])
-                    net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda(device=gpus[0])
+                    net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
+                    net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
                 else:
                     w1 = net.conv1.weight.data.numpy()
                     w2 = net.conv2.weight.data.numpy()
