@@ -132,7 +132,7 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 ### Define a Loss function and optimizer ################################
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=1e-4, momentum=0.9)
+optimizer = optim.SGD(net.parameters(), lr=1e-2, momentum=0.9)
 
 #### Train the network #################################################
 
@@ -174,7 +174,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         # print debug data
         running_loss += loss.data[0]
-        if i % 50 == 49:    # print every 2000 mini-batches
+        if i % 10 == 9:    # print every 2000 mini-batches
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 500))
             print('[%d, %5d] loss: %.3f' %
@@ -260,7 +260,7 @@ class_correct = list(0. for i in range(nClasses))
 class_total = list(0. for i in range(nClasses))
 for data in testloader:
     images, labels = data
-    outputs = net(Variable(images))
+    outputs = net(Variable(images).cpu())
     _, predicted = torch.max(outputs.data, 1)
     c = (predicted == labels).squeeze()
     for i in range(4):
