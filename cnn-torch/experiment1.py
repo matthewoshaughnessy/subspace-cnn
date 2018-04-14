@@ -176,9 +176,9 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
         running_loss += loss.data[0]
         if i % 10 == 9:    # print every 2000 mini-batches
             print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 500))
+                  (epoch + 1, i + 1, running_loss / 10))
             print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 500), file=open(outputFile,"a"))
+                  (epoch + 1, i + 1, running_loss / 10), file=open(outputFile,"a"))
             running_loss = 0.0
 
             # project weights
@@ -207,7 +207,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     total = 0.0
     for data in testloader:
         images, labels = data
-        outputs = net(Variable(images))
+        outputs = net(Variable(images).cpu())
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum()
