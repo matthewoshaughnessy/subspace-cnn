@@ -42,7 +42,7 @@ def printlog(text,filename):
 ### initialization ###############################################
 # print selected options
 printlog("Pytorch version:", outputFile)
-printlog(torch.__version__)
+printlog(torch.__version__, outputFile)
 printlog("Output name: %s" % (outputName), outputFile)
 printlog('Outputting debug data to: %s' % (outputFile), outputFile)
 printlog('Outputting matlab data to: %s' % (outputMat), outputFile)
