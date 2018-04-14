@@ -56,13 +56,13 @@ transform = transforms.Compose(
 # get training data
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=64,
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=128,
                                           shuffle=True, num_workers=2)
 
 # get (potentially noisy) test data
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
-testloader = torch.utils.data.DataLoader(testset, batch_size=64,
+testloader = torch.utils.data.DataLoader(testset, batch_size=128,
                                          shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer',
@@ -133,6 +133,9 @@ time_history[0] = time.time();
 # train
 for epoch in range(nEpochs):  # loop over the dataset multiple times
 
+    if torch.cuda.is_available():
+        net.cuda()
+
     running_loss = 0.0
     #scheduler.step()
     printlog( 'Epoch %d: lr = %f' % (epoch, optimizer.param_groups[0]['lr']), outputFile)
@@ -165,9 +168,9 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         # print debug data
         running_loss += loss.data[0]
-        if i % 100 == 99:    # print every 2000 mini-batches
+        if i % 10 == 9:    # print every 2000 mini-batches
             printlog('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 100), outputFile)
+                  (epoch + 1, i + 1, running_loss / 10), outputFile)
             running_loss = 0.0
 
             # project weights
@@ -195,8 +198,9 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     correct = 0.0
     total = 0.0
     for data in testloader:
+        net.cpu()
         images, labels = data
-        outputs = net(Variable(images).cpu())
+        outputs = net(Variable(images))
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum()
