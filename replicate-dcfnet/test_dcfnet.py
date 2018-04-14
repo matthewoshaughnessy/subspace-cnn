@@ -124,7 +124,7 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 
 criterion = nn.CrossEntropyLoss()
 #optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
+optimizer = torch.optim.Adam(net.parameters(), lr=5e-3)
 #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
 #### Train the network #################################################
@@ -202,7 +202,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     # record accuracy on test set
     correct = 0.0
     total = 0.0
-    #net.cpu()
+    net.cpu()
     for data in testloader:
         images, labels = data
         outputs = net(Variable(images))
