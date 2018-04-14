@@ -83,7 +83,7 @@ nClasses = len(classes)
 
 if torch.cuda.is_available():
     torch.set_default_tensor_type('torch.cuda.FloatTensor')
-    torch.cuda.set_device(0)
+    torch.cuda.set_device(3)
 
 ### Define the CNN ###############################################
 
