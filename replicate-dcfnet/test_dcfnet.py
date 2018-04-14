@@ -57,13 +57,13 @@ transform = transforms.Compose(
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=128,
-                                          shuffle=True, num_workers=1)
+                                          shuffle=True, num_workers=4)
 
 # get (potentially noisy) test data
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
 testloader = torch.utils.data.DataLoader(testset, batch_size=128,
-                                         shuffle=False, num_workers=1)
+                                         shuffle=False, num_workers=4)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer',
            'dog', 'frog', 'horse', 'ship', 'truck')
@@ -124,7 +124,7 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 
 criterion = nn.CrossEntropyLoss()
 #optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-optimizer = torch.optim.Adam(net.parameters(), lr=1e-4)
+optimizer = torch.optim.Adam(net.parameters(), lr=1e-3)
 #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
 #### Train the network #################################################
