@@ -20,7 +20,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 1000
+nEpochs = 1
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
@@ -138,8 +138,8 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 ### Define a Loss function and optimizer ################################
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.005, momentum=0.9)
-#optimizer = torch.optim.Adam(net.parameters(), lr=1e-5)
+#optimizer = optim.SGD(net.parameters(), lr=0.005, momentum=0.9)
+optimizer = torch.optim.Adam(net.parameters(), lr=1e-5)
 #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
 #### Train the network #################################################
