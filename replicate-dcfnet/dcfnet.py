@@ -20,13 +20,16 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 1000
+nEpochs = 3
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
 subspaceProject = False
 if len(sys.argv) > 2 and (sys.argv[2].lower() == 'true'):
     subspaceProject = True
+noisyData = False
+if len(sys.argv) > 3 and (sys.argv[3].lower() == 'true'):
+    noisyData = True
 
 ### helper functions #############################################
 def unpickle(file):
@@ -50,6 +53,10 @@ if subspaceProject:
     printlog('Subspace projection ON', outputFile)
 else:
     printlog('Subspace projection OFF', outputFile)
+if noisyData:
+    printlog('Noisy test set ON', outputFile)
+else:
+    printlog('Noisy test set OFF', outputFile)
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -64,6 +71,12 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=128,
 # get (potentially noisy) test data
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
+if noisyData:
+    test_batch_noisy = unpickle('./data/cifar-10-batches-py/test_batch_20dB')
+    features = np.reshape(test_batch_noisy,(10000,3,32,32)).astype('uint8')
+    features = np.transpose(features,(0,2,3,1))
+    testset.test_data = features
+
 testloader = torch.utils.data.DataLoader(testset, batch_size=128,
                                          shuffle=False, num_workers=4)
 
