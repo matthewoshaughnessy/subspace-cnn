@@ -222,6 +222,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
         inputs, labels = data
         if torch.cuda.is_available():
             inputs, labels = Variable(inputs.cuda()), labels.cuda()
+            outputs = net(inputs)
         else:
             inputs, labels = Variable(inputs), labels
 
@@ -252,22 +253,6 @@ fil_1_ch_3 = fil_1[2,:,:]
 coeff_fil_1_ch_1 = np.dot(basis.T,np.reshape(fil_1_ch_1,25,'F'))
 coeff_fil_1_ch_2 = np.dot(basis.T,np.reshape(fil_1_ch_2,25,'F'))
 coeff_fil_1_ch_3 = np.dot(basis.T,np.reshape(fil_1_ch_3,25,'F'))
-
-#plt.figure()
-#plt.plot(np.abs(coeff_fil_1_ch_1),'*-')
-#plt.figure()
-#plt.plot(np.abs(coeff_fil_1_ch_2),'*-')
-#plt.figure()
-#plt.plot(np.abs(coeff_fil_1_ch_3),'*-')
-
-correct = 0
-total = 0
-for data in testloader:
-    images, labels = data
-    outputs = net(Variable(images))
-    _, predicted = torch.max(outputs.data, 1)
-    total += labels.size(0)
-    correct += (predicted == labels).sum()
 
 printlog('Accuracy of the network on the 10000 test images: %d %%' % (
     100 * correct / total), outputFile)
