@@ -257,29 +257,27 @@ coeff_fil_1_ch_3 = np.dot(basis.T,np.reshape(fil_1_ch_3,25,'F'))
 printlog('Accuracy of the network on the 10000 test images: %d %%' % (
     100 * correct / total), outputFile)
 
-class_correct = list(0. for i in range(nClasses))
-class_total = list(0. for i in range(nClasses))
-for data in testloader:
-    images, labels = data
-    outputs = net(Variable(images))
-    _, predicted = torch.max(outputs.data, 1)
-    c = (predicted == labels).squeeze()
-    for i in range(4):
-        label = labels[i]
-        class_correct[label] += c[i]
-        class_total[label] += 1
+#class_correct = list(0. for i in range(nClasses))
+#class_total = list(0. for i in range(nClasses))
+#for data in testloader:
+#    images, labels = data
+#    outputs = net(Variable(images))
+#    _, predicted = torch.max(outputs.data, 1)
+#    c = (predicted == labels).squeeze()
+#    for i in range(4):
+#        label = labels[i]
+#        class_correct[label] += c[i]
+#        class_total[label] += 1
 
-for i in range(nClasses):
-    printlog('Accuracy of %5s : %2d %%' % (
-        classes[i], 100 * class_correct[i] / class_total[i]), outputFile)
+#for i in range(nClasses):
+#    printlog('Accuracy of %5s : %2d %%' % (
+#        classes[i], 100 * class_correct[i] / class_total[i]), outputFile)
 
 printlog('Saving data to mat file...', outputFile)
 sio.savemat(outputMat,{
     'loss_history' : loss_history,
     'testaccuracy_history' : testaccuracy_history,
     'time_history' : time_history,
-    'class_correct' : class_correct,
-    'class_total' : class_total,
     'coeff_1' : coeff_fil_1_ch_1,
     'coeff_2' : coeff_fil_1_ch_2,
     'coeff_3' : coeff_fil_1_ch_3})
