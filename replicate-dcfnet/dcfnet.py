@@ -20,7 +20,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 100
+nEpochs = 200
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
@@ -137,7 +137,7 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 ### Define a Loss function and optimizer ################################
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(net.parameters(), lr=0.005, momentum=0.9)
 #optimizer = torch.optim.Adam(net.parameters(), lr=2e-6)
 #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
@@ -158,8 +158,8 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     running_loss = 0.0
     #scheduler.step()
 
-    if epoch > 0 and epoch % 5 == 0:
-        optimizer.param_groups[0]['lr'] = 0.1 * optimizer.param_groups[0]['lr']
+    if epoch > 0 and epoch % 30 == 0:
+        optimizer.param_groups[0]['lr'] = 0.2 * optimizer.param_groups[0]['lr']
 
     printlog( 'Epoch %d: lr = %f' % (epoch, optimizer.param_groups[0]['lr']), outputFile)
 
