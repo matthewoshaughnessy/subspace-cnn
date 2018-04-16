@@ -138,7 +138,7 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 ### Define a Loss function and optimizer ################################
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.005, momentum=0.9)
+optimizer = optim.SGD(net.parameters(), lr=0.005) #, momentum=0.9)
 #optimizer = torch.optim.Adam(net.parameters(), lr=2e-6)
 #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
