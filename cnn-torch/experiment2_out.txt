@@ -1,0 +1,35 @@
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+[1,   500] loss: 2.302
+[1,  1000] loss: 2.297
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
+Subspace projection OFF
+Noisy test set ON
+Reduced training set ON
