@@ -62,7 +62,7 @@ transform = transforms.Compose(
 # get training data
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=4,
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=128,
                                           shuffle=True, num_workers=2)
 
 # get (potentially noisy) test data
@@ -73,7 +73,7 @@ if noisyData:
     features = np.reshape(test_batch_noisy,(10000,3,32,32)).astype('uint8')
     features = np.transpose(features,(0,2,3,1))
     testset.test_data = features
-testloader = torch.utils.data.DataLoader(testset, batch_size=4,
+testloader = torch.utils.data.DataLoader(testset, batch_size=128,
                                          shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat',
@@ -83,6 +83,7 @@ nClasses = len(classes)
 
 if torch.cuda.is_available():
     torch.set_default_tensor_type('torch.cuda.FloatTensor')
+    torch.cuda.set_device(0)
 
 ### Define the CNN ###############################################
 
@@ -107,7 +108,7 @@ class Net(nn.Module):
 
 net = Net()
 if torch.cuda.is_available():
-    net = net.cuda()
+    net = net.cuda(0)
 
 ### Define basis and basis indices for each conv layer ###########
 
@@ -132,7 +133,7 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 ### Define a Loss function and optimizer ################################
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(net.parameters(), lr=1e-2, momentum=0.9)
 
 #### Train the network #################################################
 
@@ -145,6 +146,9 @@ time_history[0] = time.time();
 # train
 for epoch in range(nEpochs):  # loop over the dataset multiple times
 
+    if torch.cuda.is_available():
+        net.cuda(0)
+
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         # get the inputs
@@ -152,7 +156,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         # wrap them in Variable
         if torch.cuda.is_available():
-            inputs, labels = Variable(inputs.cuda()), Variable(labels.cuda())
+            inputs, labels = Variable(inputs.cuda(0)), Variable(labels.cuda(0))
         else:
             inputs, labels = Variable(inputs), Variable(labels)
 
@@ -161,7 +165,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         # forward + backward + optimize
         if torch.cuda.is_available():
-            outputs = net(inputs.cuda())
+            outputs = net(inputs.cuda(0))
         else:
             outputs = net(inputs)
         loss = criterion(outputs, labels)
@@ -174,11 +178,11 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         # print debug data
         running_loss += loss.data[0]
-        if i % 500 == 499:    # print every 2000 mini-batches
+        if i % 10 == 9:    # print every 2000 mini-batches
             print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 500))
+                  (epoch + 1, i + 1, running_loss / 10))
             print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 500), file=open(outputFile,"a"))
+                  (epoch + 1, i + 1, running_loss / 10), file=open(outputFile,"a"))
             running_loss = 0.0
 
             # project weights
@@ -188,8 +192,8 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
                     w2 = net.conv2.weight.data.cpu().numpy()
                     w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
                     w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-                    net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
-                    net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
+                    net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda(0)
+                    net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda(0)
                 else:
                     w1 = net.conv1.weight.data.numpy()
                     w2 = net.conv2.weight.data.numpy()
@@ -206,6 +210,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     correct = 0.0
     total = 0.0
     for data in testloader:
+        net.cpu()
         images, labels = data
         outputs = net(Variable(images))
         _, predicted = torch.max(outputs.data, 1)
@@ -260,7 +265,7 @@ class_correct = list(0. for i in range(nClasses))
 class_total = list(0. for i in range(nClasses))
 for data in testloader:
     images, labels = data
-    outputs = net(Variable(images))
+    outputs = net(Variable(images).cpu())
     _, predicted = torch.max(outputs.data, 1)
     c = (predicted == labels).squeeze()
     for i in range(4):
