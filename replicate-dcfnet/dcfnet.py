@@ -31,12 +31,12 @@ noisyData = False
 if len(sys.argv) > 3 and (sys.argv[3].lower() == 'true'):
     noisyData = True
 
-lr = 0.005
+lr_def = 0.005
 if len(sys.argv) > 4:
-    lr = sys.argv[4]
-momentum = 0.9
+    lr_def = sys.argv[4]
+momentum_def = 0.9
 if len(sys.argv) > 5:
-    momentum = sys.argv[5]
+    momentum_def = sys.argv[5]
 lr_decay = 0.5
 if len(sys.argv) > 6:
     lr_decay = sys.argv[6]
@@ -151,7 +151,7 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 ### Define a Loss function and optimizer ################################
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=lr, momentum=momentum)
+optimizer = optim.SGD(net.parameters(), lr=lr_def, momentum=momentum_def)
 #optimizer = torch.optim.Adam(net.parameters(), lr=2e-6)
 #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
