@@ -1,0 +1,19 @@
+Pytorch version:
+0.3.1
+Output name: test_out
+Outputting debug data to: test_out.txt
+Outputting matlab data to: test_out.mat
+Subspace projection OFF
+Noisy test set OFF
+Epoch 0: lr = 0.005000
+[1,    10] loss: 2.29509
+[1,    20] loss: 2.27297
+[1,    30] loss: 2.24962
+[1,    40] loss: 2.19121
+[1,    50] loss: 2.15573
+[1,    60] loss: 2.13436
+[1,    70] loss: 2.07585
+[1,    80] loss: 2.04581
+[1,    90] loss: 1.99061
+[1,   100] loss: 2.01279
+[1,   110] loss: 2.00032

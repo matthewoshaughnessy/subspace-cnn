@@ -94,18 +94,17 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, (5,5), padding=2)
         self.conv2 = nn.Conv2d(64, 128, (5,5), padding=2)
+        self.bn2 = nn.BatchNorm2d(128)
         self.conv3 = nn.Conv2d(128, 256, (5,5), padding=2)
+        self.bn3 = nn.BatchNorm2d(256)
         self.pool = nn.MaxPool2d(3, 3)
         self.fc1 = nn.Linear(256, 512)
         self.fc2 = nn.Linear(512, nClasses)
 
     def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = self.pool(x)
-        x = F.relu(self.conv2(x))
-        x = self.pool(x)
-        x = F.relu(self.conv3(x))
-        x = self.pool(x)
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.bn2(self.conv2(x))))
+        x = self.pool(F.relu(self.bn3(self.conv3(x))))
         x = x.view(-1, 256 * 1 * 1)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
@@ -158,6 +157,10 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
     running_loss = 0.0
     #scheduler.step()
+
+    if epoch > 0 and epoch % 30 == 0:
+        optimizer.param_groups[0]['lr'] = 0.2 * optimizer.param_groups[0]['lr']
+
     printlog( 'Epoch %d: lr = %f' % (epoch, optimizer.param_groups[0]['lr']), outputFile)
 
     for i, data in enumerate(trainloader, 0):
@@ -188,8 +191,8 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
 
         # print debug data
         running_loss += loss.data[0]
-        if i % 10 == 9:    # print every 2000 mini-batches
-            printlog('[%d, %5d] loss: %.4f' %
+        if i % 10 == 9:    # print every 10 mini-batches
+            printlog('[%d, %5d] loss: %.5f' %
                   (epoch + 1, i + 1, running_loss / 10), outputFile)
             running_loss = 0.0
 
