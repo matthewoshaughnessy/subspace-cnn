@@ -20,7 +20,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 200
+nEpochs = 50
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
@@ -158,8 +158,8 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     running_loss = 0.0
     #scheduler.step()
 
-    if epoch > 0 and epoch % 30 == 0:
-        optimizer.param_groups[0]['lr'] = 0.2 * optimizer.param_groups[0]['lr']
+    if epoch > 0 and epoch % 10 == 0:
+        optimizer.param_groups[0]['lr'] = 0.5 * optimizer.param_groups[0]['lr']
 
     printlog( 'Epoch %d: lr = %f' % (epoch, optimizer.param_groups[0]['lr']), outputFile)
 
