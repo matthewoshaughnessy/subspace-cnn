@@ -8,6 +8,7 @@ for lr in 0.05 0.01 0.005 0.001
                 #do echo "Out_$lr_$momentum_$lr_decay"
 
                                     filename="out_"$trials"_"$lr"_"$momentum"_"$lr_decay
+				    echo "Running with these param:"$filename
                                     CUDA_VISIBLE_DEVICES=3 python3 dcfnet.py $filename true false $lr $momentum $lr_decay
                                 done
                         done
