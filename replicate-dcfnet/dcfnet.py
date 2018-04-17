@@ -32,16 +32,16 @@ if len(sys.argv) > 3 and (sys.argv[3].lower() == 'true'):
     noisyData = True
 
 lr = 0.005
-if len(sys.argv) > 4 
+if len(sys.argv) > 4:
     lr = sys.argv[4]
 momentum = 0.9
-if len(sys.argv) > 5
+if len(sys.argv) > 5:
     momentum = sys.argv[5]
 lr_decay = 0.5
-if len(sys.argv) > 6
+if len(sys.argv) > 6:
     lr_decay = sys.argv[6]
 batch_size = 128
-if len(sys.argv) > 7
+if len(sys.argv) > 7:
     batch_size = sys.argv[7]
 
 ### helper functions #############################################
