@@ -33,19 +33,19 @@ if len(sys.argv) > 3 and (sys.argv[3].lower() == 'true'):
 
 lr_def = 0.005
 if len(sys.argv) > 4:
-    lr_def = sys.argv[4]
+    lr_def = float(sys.argv[4])
 print("Default learning rate is: ",lr_def)
 momentum_def = 0.9
 if len(sys.argv) > 5:
-    momentum_def = sys.argv[5]
+    momentum_def = float(sys.argv[5])
 print("Default momentum is: ", momentum_def)
 lr_decay = 0.5
 if len(sys.argv) > 6:
-    lr_decay = sys.argv[6]
+    lr_decay = float(sys.argv[6])
 print("Default learning rate decay is: ",lr_decay)
 batch_size = 128
 if len(sys.argv) > 7:
-    batch_size = sys.argv[7]
+    batch_size = int(sys.argv[7])
 
 ### helper functions #############################################
 def unpickle(file):
