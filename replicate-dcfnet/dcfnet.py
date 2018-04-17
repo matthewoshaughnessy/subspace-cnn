@@ -178,7 +178,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     if epoch > 0 and epoch % 10 == 0:
         optimizer.param_groups[0]['lr'] = lr_decay* optimizer.param_groups[0]['lr']
 
-    printlog( 'Epoch %d: lr = %f' % (epoch, optimizer.param_groups[0]['lr']), outputFile)
+    printlog( 'Epoch %d: lr = %f' % (epoch,float(optimizer.param_groups[0]['lr'])), outputFile)
 
     for i, data in enumerate(trainloader, 0):
         # get the inputs
