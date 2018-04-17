@@ -20,7 +20,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 50
+nEpochs = 25
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
@@ -30,6 +30,19 @@ if len(sys.argv) > 2 and (sys.argv[2].lower() == 'true'):
 noisyData = False
 if len(sys.argv) > 3 and (sys.argv[3].lower() == 'true'):
     noisyData = True
+
+lr = 0.005
+if len(sys.argv) > 4 
+    lr = sys.argv[4]
+momentum = 0.9
+if len(sys.argv) > 5
+    momentum = sys.argv[5]
+lr_decay = 0.5
+if len(sys.argv) > 6
+    lr_decay = sys.argv[6]
+batch_size = 128
+if len(sys.argv) > 7
+    batch_size = sys.argv[7]
 
 ### helper functions #############################################
 def unpickle(file):
@@ -65,7 +78,7 @@ transform = transforms.Compose(
 # get training data
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=128,
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
                                           shuffle=True, num_workers=4)
 
 # get (potentially noisy) test data
@@ -138,7 +151,7 @@ basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 ### Define a Loss function and optimizer ################################
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.005, momentum=0.9)
+optimizer = optim.SGD(net.parameters(), lr=lr, momentum=momentum)
 #optimizer = torch.optim.Adam(net.parameters(), lr=2e-6)
 #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
@@ -160,7 +173,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     #scheduler.step()
 
     if epoch > 0 and epoch % 10 == 0:
-        optimizer.param_groups[0]['lr'] = 0.5 * optimizer.param_groups[0]['lr']
+        optimizer.param_groups[0]['lr'] = lr_decay* optimizer.param_groups[0]['lr']
 
     printlog( 'Epoch %d: lr = %f' % (epoch, optimizer.param_groups[0]['lr']), outputFile)
 
