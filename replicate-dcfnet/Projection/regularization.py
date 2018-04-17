@@ -19,8 +19,8 @@ def subspace_projection(k,w,basis=None, basis_indices=None):
     if basis_indices is None:
         basis_indices = np.zeros((F,k))
         for ii in range(F):
-            indices = np.random.permutation(HH*WW)[:k]
-            basis_indices[ii,:] = indices
+            #indices = np.random.permutation(HH*WW)[:k]
+            basis_indices[ii,:] = np.arange(k)
             
     for ii in range(F):
         indices = basis_indices[ii,:].astype(int)
