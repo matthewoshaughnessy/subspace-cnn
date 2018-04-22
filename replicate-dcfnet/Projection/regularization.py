@@ -43,7 +43,7 @@ def subspace_projection_gpu(k,w,basis=None, basis_indices=None):
         basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho')
     
     #w_reshaped = np.reshape(w,(F,C,HH*WW),'F')
-    w_reshaped = torch.view(w,(F,C,HH*WW)) # TODO -- 'F'?  transpose first?
+    w_reshaped = w.view(F,C,HH*WW) # TODO -- 'F'?  transpose first?
 
     #w_projected = np.zeros(w_reshaped.shape)
     w_projected = torch.zeros(w_reshaped.shape)
@@ -62,6 +62,6 @@ def subspace_projection_gpu(k,w,basis=None, basis_indices=None):
             #w_projected[ii,jj,:] = np.dot(B,w_reshaped[ii,jj,:])
             w_projected[ii,jj,:] = torch.mm(B,w_reshaped[ii,jj,:])
     #w_projected = np.reshape(w_projected,(F,C,HH,WW),'F')
-    w_projected = torch.view(w_projected,(F,C,HH,WW))
+    w_projected = w_projected.view(F,C,HH,WW)
     return w_projected
 
