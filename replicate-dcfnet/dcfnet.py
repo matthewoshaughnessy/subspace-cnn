@@ -142,9 +142,9 @@ class Net(nn.Module):
         self.basis_indices3 = gen_basis_indices(self.F3,self.H3,self.W3,self.dim3)
 
         # basis
-        self.basis1 = scipy.fftpack.dct(np.eye(self.H1*self.W1),norm='ortho').type(torch.FloatTensor)
-        self.basis2 = scipy.fftpack.dct(np.eye(self.H2*self.W2),norm='ortho').type(torch.FloatTensor)
-        self.basis3 = scipy.fftpack.dct(np.eye(self.H3*self.W3),norm='ortho').type(torch.FloatTensor)
+        self.basis1 = torch.from_numpy(scipy.fftpack.dct(np.eye(self.H1*self.W1),norm='ortho'))
+        self.basis2 = torch.from_numpy(scipy.fftpack.dct(np.eye(self.H2*self.W2),norm='ortho'))
+        self.basis3 = torch.from_numpy(scipy.fftpack.dct(np.eye(self.H3*self.W3),norm='ortho'))
 
     def forward(self, x):
         x = self.pool(F.relu(self.bn1(self.conv1(x))))
