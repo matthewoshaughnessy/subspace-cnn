@@ -120,32 +120,6 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(256, 512)
         self.fc2 = nn.Linear(512, nClasses)
 
-        # conv1
-        self.F1 = (self.conv1.weight).size()[0]
-        self.H1 = (self.conv1.weight).size()[2]
-        self.W1 = (self.conv1.weight).size()[3]
-        self.dim1 = np.int(0.5*self.H1*self.W1)
-        self.basis_indices1 = gen_basis_indices(self.F1,self.H1,self.W1,self.dim1)
-
-        # conv2
-        self.F2 = (self.conv2.weight).size()[0]
-        self.H2 = (self.conv2.weight).size()[2]
-        self.W2 = (self.conv2.weight).size()[3]
-        self.dim2 = np.int(0.5*self.H2*self.W2)
-        self.basis_indices2 = gen_basis_indices(self.F2,self.H2,self.W2,self.dim2)
-
-        # conv3
-        self.F3 = (self.conv3.weight).size()[0]
-        self.H3 = (self.conv3.weight).size()[2]
-        self.W3 = (self.conv3.weight).size()[3]
-        self.dim3 = np.int(0.5*self.H3*self.W3)
-        self.basis_indices3 = gen_basis_indices(self.F3,self.H3,self.W3,self.dim3)
-
-        # basis
-        self.basis1 = torch.from_numpy(scipy.fftpack.dct(np.eye(self.H1*self.W1),norm='ortho'))
-        self.basis2 = torch.from_numpy(scipy.fftpack.dct(np.eye(self.H2*self.W2),norm='ortho'))
-        self.basis3 = torch.from_numpy(scipy.fftpack.dct(np.eye(self.H3*self.W3),norm='ortho'))
-
     def forward(self, x):
         x = self.pool(F.relu(self.bn1(self.conv1(x))))
         x = self.pool(F.relu(self.bn2(self.conv2(x))))
@@ -159,6 +133,32 @@ net = Net()
 
 if torch.cuda.is_available():
     net = net.cuda()
+
+        # conv1
+F1 = (net.conv1.weight).size()[0]
+H1 = (net.conv1.weight).size()[2]
+W1 = (net.conv1.weight).size()[3]
+dim1 = np.int(0.5*H1*W1)
+basis_indices1 = gen_basis_indices(F1,H1,W1,dim1)
+
+# conv2
+F2 = (net.conv2.weight).size()[0]
+H2 = (net.conv2.weight).size()[2]
+W2 = (net.conv2.weight).size()[3]
+dim2 = np.int(0.5*H2*W2)
+basis_indices2 = gen_basis_indices(F2,H2,W2,dim2)
+
+# conv3
+F3 = (net.conv3.weight).size()[0]
+H3 = (net.conv3.weight).size()[2]
+W3 = (net.conv3.weight).size()[3]
+dim3 = np.int(0.5*H3*W3)
+basis_indices3 = gen_basis_indices(F3,H3,W3,dim3)
+
+# basis
+basis1 = torch.from_numpy(scipy.fftpack.dct(np.eye(H1*W1),norm='ortho'))
+basis2 = torch.from_numpy(scipy.fftpack.dct(np.eye(H2*W2),norm='ortho'))
+basis3 = torch.from_numpy(scipy.fftpack.dct(np.eye(H3*W3),norm='ortho'))
 
 ### Define a Loss function and optimizer ################################
 
