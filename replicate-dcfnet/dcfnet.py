@@ -238,9 +238,10 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
                     # on cpu
                     w1 = net.conv1.weight.data.cpu().numpy()
                     w2 = net.conv2.weight.data.cpu().numpy()
-                    w1p = (subspace_projection(net.dim1,net.w1,basis1,net.basis_indices1))
-                    w2p = (subspace_projection(net.dim2,net.w2,basis2,net.basis_indices2))
-                    w2p = (subspace_projection(net.dim3,net.w2,basis2,net.basis_indices3))
+                    w3 = net.conv3.weight.data.cpu().numpy()
+                    w1p = (subspace_projection(net.dim1,w1,net.basis1,net.basis_indices1))
+                    w2p = (subspace_projection(net.dim2,w2,net.basis2,net.basis_indices2))
+                    w3p = (subspace_projection(net.dim3,w3,net.basis3,net.basis_indices3))
                     net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
                     net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
                     net.conv3.weight.data = (torch.from_numpy(w3p)).type(torch.FloatTensor).cuda()
