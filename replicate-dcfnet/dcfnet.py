@@ -156,9 +156,9 @@ dim3 = np.int(0.5*H3*W3)
 basis_indices3 = gen_basis_indices(F3,H3,W3,dim3)
 
 # basis
-basis1 = torch.from_numpy(scipy.fftpack.dct(np.eye(H1*W1),norm='ortho').float())
-basis2 = torch.from_numpy(scipy.fftpack.dct(np.eye(H2*W2),norm='ortho').float())
-basis3 = torch.from_numpy(scipy.fftpack.dct(np.eye(H3*W3),norm='ortho').float())
+basis1 = torch.from_numpy(scipy.fftpack.dct(np.eye(H1*W1),norm='ortho').astype(float))
+basis2 = torch.from_numpy(scipy.fftpack.dct(np.eye(H2*W2),norm='ortho').astype(float))
+basis3 = torch.from_numpy(scipy.fftpack.dct(np.eye(H3*W3),norm='ortho').astype(float))
 
 ### Define a Loss function and optimizer ################################
 
