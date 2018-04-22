@@ -42,7 +42,7 @@ def subspace_projection_gpu(k,w,basis=None, basis_indices=None):
     if basis is None:
         basis = torch.from_numpy(scipy.fftpack.dct(np.eye(HH*WW),norm='ortho').as_type(float)).cuda()
     else:
-        basis = basis.cuda()
+        basis = basis.float().cuda()
     
     #w_reshaped = np.reshape(w,(F,C,HH*WW),'F')
     w_reshaped = w.view(F,C,HH*WW) # TODO -- 'F'?  transpose first?
@@ -61,8 +61,9 @@ def subspace_projection_gpu(k,w,basis=None, basis_indices=None):
         for jj in range(C):
             basis_i = basis[:,torch.LongTensor(indices).cuda()]
             #B = np.dot(basis[:,indices],basis[:,indices].T)
-            B = torch.mm(basis_i,torch.transpose(basis_i,0,1)).float()
+            B = torch.mm(basis_i,torch.transpose(basis_i,0,1))
             #w_projected[ii,jj,:] = np.dot(B,w_reshaped[ii,jj,:])
+            print( w_reshaped.shape )
             w_projected[ii,jj,:] = torch.mm(B,w_reshaped[ii,jj,:])
     #w_projected = np.reshape(w_projected,(F,C,HH,WW),'F')
     w_projected = w_projected.view(F,C,HH,WW)
