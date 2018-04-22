@@ -20,7 +20,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 25
+nEpochs = 2
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
@@ -147,9 +147,29 @@ W2 = (net.conv2.weight).size()[3]
 dim2 = np.int(0.5*H2*W2)
 basis_indices2 = gen_basis_indices(F2,H2,W2,dim2)
 
-# full basis
+# conv3
+F3 = (net.conv3.weight).size()[0]
+H3 = (net.conv3.weight).size()[2]
+W3 = (net.conv3.weight).size()[3]
+dim3 = np.int(0.5*H3*W3)
+basis_indices3 = gen_basis_indices(F3,H3,W3,dim3)
+
+# basis
 basis1 = scipy.fftpack.dct(np.eye(H1*W1),norm='ortho')
 basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
+basis3 = scipy.fftpack.dct(np.eye(H3*W3),norm='ortho')
+
+if torch.cuda.is_available():
+    dim1 = dim1.cuda()
+    dim2 = dim2.cuda()
+    dim3 = dim3.cuda()
+    basis1 = basis1.cuda()
+    basis2 = basis2.cuda()
+    basis3 = basis3.cuda()
+    basis_indices1 = basis_indices1.cuda()
+    basis_indices2 = basis_indices2.cuda()
+    basis_indices3 = basis_indices3.cuda()
+    
 
 ### Define a Loss function and optimizer ################################
 
@@ -216,23 +236,27 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
             # project weights
             if subspaceProject:
                 if torch.cuda.is_available():
-                    w1 = net.conv1.weight.data.cpu().numpy()
-                    w2 = net.conv2.weight.data.cpu().numpy()
-                    w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
-                    w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-                    net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
-                    net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
+                    # on gpu
+                    net.conv1.weight.data = subspace_projection(dim1,net.conv1.weight.data,basis1,basis_indices1)
+                    net.conv2.weight.data = subspace_projection(dim2,net.conv2.weight.data,basis2,basis_indices2)
+                    net.conv3.weight.data = subspace_projection(dim3,net.conv3.weight.data,basis3,basis_indices3)
+                    # on cpu
+                    #w1 = net.conv1.weight.data.cpu().numpy()
+                    #w2 = net.conv2.weight.data.cpu().numpy()
+                    #w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+                    #w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+                    #net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
+                    #net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
                 else:
                     w1 = net.conv1.weight.data.numpy()
                     w2 = net.conv2.weight.data.numpy()
+                    w3 = net.conv2.weight.data.numpy()
                     w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
                     w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+                    w3p = (subspace_projection(dim3,w3,basis3,basis_indices3))
                     net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
                     net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
-            #w1n = net.conv1.weight.data.numpy()
-            #w2n = net.conv2.weight.data.numpy()
-            #print(np.linalg.norm(w1 - w1n))
-            #print(np.linalg.norm(w2 - w2n))
+                    net.conv3.weight.data = (torch.from_numpy(w3p)).type(torch.FloatTensor)
 
     # record accuracy on test set
     correct = 0.0
