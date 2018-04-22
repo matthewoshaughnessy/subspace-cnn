@@ -13,7 +13,6 @@ def subspace_projection(k,w,basis=None, basis_indices=None):
     if basis is None:
         basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho')
     
-    print( w )
     w_reshaped = np.reshape(w,(F,C,HH*WW),'F')
     w_projected = np.zeros(w_reshaped.shape)
     
