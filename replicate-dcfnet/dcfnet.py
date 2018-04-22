@@ -237,7 +237,9 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
             if subspaceProject:
                 if torch.cuda.is_available():
                     # on gpu
-                    net.conv1.weight.data = subspace_projection(Variable(dim1),Variable(net.conv1.weight.data),Variable(basis1),Variable(basis_indices1))
+                    projectedWeights1 = subspace_projection(Variable(dim1),Variable(net.conv1.weight.data),Variable(basis1),Variable(basis_indices1))
+                    print( projectedWeights1 )
+                    net.conv1.weight.data = projectedWeights1
                     net.conv2.weight.data = subspace_projection(dim2,net.conv2.weight.data,basis2,basis_indices2)
                     net.conv3.weight.data = subspace_projection(dim3,net.conv3.weight.data,basis3,basis_indices3)
                     # on cpu
