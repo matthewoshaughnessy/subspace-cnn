@@ -159,16 +159,16 @@ basis1 = scipy.fftpack.dct(np.eye(H1*W1),norm='ortho')
 basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 basis3 = scipy.fftpack.dct(np.eye(H3*W3),norm='ortho')
 
-if torch.cuda.is_available():
-    dim1 = dim1.cuda()
-    dim2 = dim2.cuda()
-    dim3 = dim3.cuda()
-    basis1 = basis1.cuda()
-    basis2 = basis2.cuda()
-    basis3 = basis3.cuda()
-    basis_indices1 = basis_indices1.cuda()
-    basis_indices2 = basis_indices2.cuda()
-    basis_indices3 = basis_indices3.cuda()
+#if torch.cuda.is_available():
+    #dim1 = dim1.cuda()
+    #dim2 = dim2.cuda()
+    #dim3 = dim3.cuda()
+    #basis1 = basis1.cuda()
+    #basis2 = basis2.cuda()
+    #basis3 = basis3.cuda()
+    #basis_indices1 = basis_indices1.cuda()
+    #basis_indices2 = basis_indices2.cuda()
+    #basis_indices3 = basis_indices3.cuda()
     
 
 ### Define a Loss function and optimizer ################################
