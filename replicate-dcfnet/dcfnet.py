@@ -226,9 +226,9 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
             if subspaceProject:
                 if torch.cuda.is_available():
                     # on gpu
-                    w1 = net.conv1.weight.data.numpy()
-                    w2 = net.conv2.weight.data.numpy()
-                    w3 = net.conv2.weight.data.numpy()
+                    w1 = net.conv1.weight.data
+                    w2 = net.conv2.weight.data
+                    w3 = net.conv2.weight.data
                     w1p = (subspace_projection(net.dim1,net.w1,net.basis1,net.basis_indices1))
                     w2p = (subspace_projection(net.dim2,net.w2,net.basis2,net.basis_indices2))
                     w3p = (subspace_projection(net.dim3,net.w3,net.basis3,net.basis_indices3))
