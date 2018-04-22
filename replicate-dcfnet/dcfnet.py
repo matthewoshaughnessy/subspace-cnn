@@ -108,6 +108,8 @@ if torch.cuda.is_available():
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
+
+        # define network
         self.conv1 = nn.Conv2d(3, 64, (5,5), padding=2)
         self.bn1 = nn.BatchNorm2d(64)
         self.conv2 = nn.Conv2d(64, 128, (5,5), padding=2)
@@ -117,6 +119,32 @@ class Net(nn.Module):
         self.pool = nn.MaxPool2d(3, 3)
         self.fc1 = nn.Linear(256, 512)
         self.fc2 = nn.Linear(512, nClasses)
+
+        # conv1
+        self.F1 = (self.conv1.weight).size()[0]
+        self.H1 = (self.conv1.weight).size()[2]
+        self.W1 = (self.conv1.weight).size()[3]
+        self.dim1 = np.int(0.5*self.H1*self.W1)
+        self.basis_indices1 = gen_basis_indices(self.F1,self.H1,self.W1,self.dim1)
+
+        # conv2
+        self.F2 = (self.conv2.weight).size()[0]
+        self.H2 = (self.conv2.weight).size()[2]
+        self.W2 = (self.conv2.weight).size()[3]
+        self.dim2 = np.int(0.5*self.H2*self.W2)
+        self.basis_indices2 = gen_basis_indices(self.F2,self.H2,self.W2,self.dim2)
+
+        # conv3
+        self.F3 = (self.conv3.weight).size()[0]
+        self.H3 = (self.conv3.weight).size()[2]
+        self.W3 = (self.conv3.weight).size()[3]
+        self.dim3 = np.int(0.5*self.H3*self.W3)
+        self.basis_indices3 = gen_basis_indices(self.F3,self.H3,self.W3,self.dim3)
+
+        # basis
+        self.basis1 = scipy.fftpack.dct(np.eye(self.H1*self.W1),norm='ortho')
+        self.basis2 = scipy.fftpack.dct(np.eye(self.H2*self.W2),norm='ortho')
+        self.basis3 = scipy.fftpack.dct(np.eye(self.H3*self.W3),norm='ortho')
 
     def forward(self, x):
         x = self.pool(F.relu(self.bn1(self.conv1(x))))
@@ -128,48 +156,9 @@ class Net(nn.Module):
         return x
 
 net = Net()
+
 if torch.cuda.is_available():
     net = net.cuda()
-
-### Define basis and basis indices for each conv layer ###########
-
-# conv1
-F1 = (net.conv1.weight).size()[0]
-H1 = (net.conv1.weight).size()[2]
-W1 = (net.conv1.weight).size()[3]
-dim1 = np.int(0.5*H1*W1)
-basis_indices1 = gen_basis_indices(F1,H1,W1,dim1)
-
-# conv2
-F2 = (net.conv2.weight).size()[0]
-H2 = (net.conv2.weight).size()[2]
-W2 = (net.conv2.weight).size()[3]
-dim2 = np.int(0.5*H2*W2)
-basis_indices2 = gen_basis_indices(F2,H2,W2,dim2)
-
-# conv3
-F3 = (net.conv3.weight).size()[0]
-H3 = (net.conv3.weight).size()[2]
-W3 = (net.conv3.weight).size()[3]
-dim3 = np.int(0.5*H3*W3)
-basis_indices3 = gen_basis_indices(F3,H3,W3,dim3)
-
-# basis
-basis1 = scipy.fftpack.dct(np.eye(H1*W1),norm='ortho')
-basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
-basis3 = scipy.fftpack.dct(np.eye(H3*W3),norm='ortho')
-
-#if torch.cuda.is_available():
-    #dim1 = dim1.cuda()
-    #dim2 = dim2.cuda()
-    #dim3 = dim3.cuda()
-    #basis1 = basis1.cuda()
-    #basis2 = basis2.cuda()
-    #basis3 = basis3.cuda()
-    #basis_indices1 = basis_indices1.cuda()
-    #basis_indices2 = basis_indices2.cuda()
-    #basis_indices3 = basis_indices3.cuda()
-    
 
 ### Define a Loss function and optimizer ################################
 
@@ -237,11 +226,15 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
             if subspaceProject:
                 if torch.cuda.is_available():
                     # on gpu
-                    projectedWeights1 = subspace_projection(dim1,Variable(torch.FloatTensor(net.conv1.weight.data)),Variable(torch.FloatTensor(basis1)),basis_indices1)
-                    print( projectedWeights1 )
-                    net.conv1.weight.data = projectedWeights1
-                    net.conv2.weight.data = subspace_projection(dim2,net.conv2.weight.data,basis2,basis_indices2)
-                    net.conv3.weight.data = subspace_projection(dim3,net.conv3.weight.data,basis3,basis_indices3)
+                    w1 = net.conv1.weight.data.numpy()
+                    w2 = net.conv2.weight.data.numpy()
+                    w3 = net.conv2.weight.data.numpy()
+                    w1p = (subspace_projection(net.dim1,net.w1,net.basis1,net.basis_indices1))
+                    w2p = (subspace_projection(net.dim2,net.w2,net.basis2,net.basis_indices2))
+                    w3p = (subspace_projection(net.dim3,net.w3,net.basis3,net.basis_indices3))
+                    net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
+                    net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
+                    net.conv3.weight.data = (torch.from_numpy(w3p)).type(torch.FloatTensor)
                     # on cpu
                     #w1 = net.conv1.weight.data.cpu().numpy()
                     #w2 = net.conv2.weight.data.cpu().numpy()
