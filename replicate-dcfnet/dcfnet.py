@@ -20,7 +20,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 3
+nEpochs = 30
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
@@ -316,3 +316,4 @@ sio.savemat(outputMat,{
     'coeff_2' : coeff_fil_1_ch_2,
     'coeff_3' : coeff_fil_1_ch_3})
 printlog('done!', outputFile)
+
