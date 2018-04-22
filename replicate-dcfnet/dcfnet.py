@@ -20,7 +20,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 2
+nEpochs = 25
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
@@ -108,8 +108,6 @@ if torch.cuda.is_available():
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-
-        # define network
         self.conv1 = nn.Conv2d(3, 64, (5,5), padding=2)
         self.bn1 = nn.BatchNorm2d(64)
         self.conv2 = nn.Conv2d(64, 128, (5,5), padding=2)
@@ -130,11 +128,12 @@ class Net(nn.Module):
         return x
 
 net = Net()
-
 if torch.cuda.is_available():
     net = net.cuda()
 
-        # conv1
+### Define basis and basis indices for each conv layer ###########
+
+# conv1
 F1 = (net.conv1.weight).size()[0]
 H1 = (net.conv1.weight).size()[2]
 W1 = (net.conv1.weight).size()[3]
@@ -148,17 +147,9 @@ W2 = (net.conv2.weight).size()[3]
 dim2 = np.int(0.5*H2*W2)
 basis_indices2 = gen_basis_indices(F2,H2,W2,dim2)
 
-# conv3
-F3 = (net.conv3.weight).size()[0]
-H3 = (net.conv3.weight).size()[2]
-W3 = (net.conv3.weight).size()[3]
-dim3 = np.int(0.5*H3*W3)
-basis_indices3 = gen_basis_indices(F3,H3,W3,dim3)
-
-# basis
-basis1 = torch.from_numpy(scipy.fftpack.dct(np.eye(H1*W1),norm='ortho')).type(torch.FloatTensor)
-basis2 = torch.from_numpy(scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')).type(torch.FloatTensor)
-basis3 = torch.from_numpy(scipy.fftpack.dct(np.eye(H3*W3),norm='ortho')).type(torch.FloatTensor)
+# full basis
+basis1 = scipy.fftpack.dct(np.eye(H1*W1),norm='ortho')
+basis2 = scipy.fftpack.dct(np.eye(H2*W2),norm='ortho')
 
 ### Define a Loss function and optimizer ################################
 
@@ -225,36 +216,23 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
             # project weights
             if subspaceProject:
                 if torch.cuda.is_available():
-                    # on gpu
-                    #w1 = net.conv1.weight.data
-                    #w2 = net.conv2.weight.data
-                    #w3 = net.conv2.weight.data
-                    #w1p = (subspace_projection_gpu(net.dim1,w1,net.basis1,net.basis_indices1))
-                    #w2p = (subspace_projection_gpu(net.dim2,w2,net.basis2,net.basis_indices2))
-                    #w3p = (subspace_projection_gpu(net.dim3,w3,net.basis3,net.basis_indices3))
-                    #net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
-                    #net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
-                    #net.conv3.weight.data = (torch.from_numpy(w3p)).type(torch.FloatTensor)
-                    # on cpu
                     w1 = net.conv1.weight.data.cpu().numpy()
                     w2 = net.conv2.weight.data.cpu().numpy()
-                    w3 = net.conv3.weight.data.cpu().numpy()
                     w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
                     w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-                    w3p = (subspace_projection(dim3,w3,basis3,basis_indices3))
                     net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
                     net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
-                    net.conv3.weight.data = (torch.from_numpy(w3p)).type(torch.FloatTensor).cuda()
                 else:
                     w1 = net.conv1.weight.data.numpy()
                     w2 = net.conv2.weight.data.numpy()
-                    w3 = net.conv2.weight.data.numpy()
                     w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
                     w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
-                    w3p = (subspace_projection(dim3,w3,basis3,basis_indices3))
                     net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
                     net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
-                    net.conv3.weight.data = (torch.from_numpy(w3p)).type(torch.FloatTensor)
+            #w1n = net.conv1.weight.data.numpy()
+            #w2n = net.conv2.weight.data.numpy()
+            #print(np.linalg.norm(w1 - w1n))
+            #print(np.linalg.norm(w2 - w2n))
 
     # record accuracy on test set
     correct = 0.0
@@ -324,5 +302,3 @@ sio.savemat(outputMat,{
     'coeff_2' : coeff_fil_1_ch_2,
     'coeff_3' : coeff_fil_1_ch_3})
 printlog('done!', outputFile)
-
-
