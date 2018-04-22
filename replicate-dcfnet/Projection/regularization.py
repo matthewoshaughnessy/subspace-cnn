@@ -59,8 +59,9 @@ def subspace_projection_gpu(k,w,basis=None, basis_indices=None):
     for ii in range(F):
         indices = basis_indices[ii,:].astype(int)
         for jj in range(C):
+            basis_i = basis[:,indices]
             #B = np.dot(basis[:,indices],basis[:,indices].T)
-            B = torch.mm(basis[:,indices],torch.transpose(basis[:,indices],0,1))
+            B = torch.mm(basis_i,torch.transpose(basis_i,0,1))
             #w_projected[ii,jj,:] = np.dot(B,w_reshaped[ii,jj,:])
             w_projected[ii,jj,:] = torch.mm(B,w_reshaped[ii,jj,:])
     #w_projected = np.reshape(w_projected,(F,C,HH,WW),'F')
