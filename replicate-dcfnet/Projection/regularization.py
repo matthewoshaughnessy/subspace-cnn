@@ -59,6 +59,7 @@ def subspace_projection_gpu(k,w,basis=None, basis_indices=None):
     for ii in range(F):
         indices = basis_indices[ii,:].astype(int)
         for jj in range(C):
+            print( 'ii = %d, jj = %d' % (ii,jj))
             basis_i = basis[:,torch.LongTensor(indices).cuda()]
             #B = np.dot(basis[:,indices],basis[:,indices].T)
             B = torch.mm(basis_i,torch.transpose(basis_i,0,1))
