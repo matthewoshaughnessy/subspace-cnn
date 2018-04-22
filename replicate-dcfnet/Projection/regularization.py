@@ -40,7 +40,7 @@ def subspace_projection_gpu(k,w,basis=None, basis_indices=None):
     """
     F,C,HH,WW = w.shape
     if basis is None:
-        basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho')
+        basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho').type(torch.FloatTensor)
     
     #w_reshaped = np.reshape(w,(F,C,HH*WW),'F')
     w_reshaped = w.view(F,C,HH*WW) # TODO -- 'F'?  transpose first?
