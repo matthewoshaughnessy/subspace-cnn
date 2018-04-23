@@ -67,7 +67,7 @@ if noisyData:
     printlog('Noisy test set ON', outputFile)
 else:
     printlog('Noisy test set OFF', outputFile)
-printlog('Using basis: %s' % (basisType.upper()), outputFile)
+printlog('Subspace dimension: %d' % (subspaceDim), outputFile)
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
