@@ -20,7 +20,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 25
+nEpochs = 1
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
@@ -293,14 +293,14 @@ printlog('Accuracy of the network on the 10000 test images: %d %%' % (
 #    printlog('Accuracy of %5s : %2d %%' % (
 #        classes[i], 100 * class_correct[i] / class_total[i]), outputFile)
 
-printlog('Saving data to mat file...', outputFile)
-sio.savemat(outputMat,{
-    'loss_history' : loss_history,
-    'testaccuracy_history' : testaccuracy_history,
-    'time_history' : time_history,
-    'coeff_1' : coeff_fil_1_ch_1,
-    'coeff_2' : coeff_fil_1_ch_2,
-    'coeff_3' : coeff_fil_1_ch_3})
-printlog('done!', outputFile)
+#printlog('Saving data to mat file...', outputFile)
+#sio.savemat(outputMat,{
+#    'loss_history' : loss_history,
+#    'testaccuracy_history' : testaccuracy_history,
+#    'time_history' : time_history,
+#    'coeff_1' : coeff_fil_1_ch_1,
+#    'coeff_2' : coeff_fil_1_ch_2,
+#    'coeff_3' : coeff_fil_1_ch_3})
+#printlog('done!', outputFile)
 
-
+torch.save(net.state_dict(), './3layerCNN')
