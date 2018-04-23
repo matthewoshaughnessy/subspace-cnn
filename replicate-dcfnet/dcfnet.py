@@ -1,5 +1,5 @@
 ##################################################################
-### Replicate results from Qiu et al. 2018, DCFNet (arXiv) ########
+### Replicate results from Qiu et al. 2018, DCFNet (arXiv) #######
 ##################################################################
 
 import numpy as np
@@ -243,10 +243,29 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
                     net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
                     net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
                     net.conv3.weight.data = (torch.from_numpy(w3p)).type(torch.FloatTensor)
-            #w1n = net.conv1.weight.data.numpy()
-            #w2n = net.conv2.weight.data.numpy()
-            #print(np.linalg.norm(w1 - w1n))
-            #print(np.linalg.norm(w2 - w2n))
+
+    # project weights
+    if subspaceProject:
+        if torch.cuda.is_available():
+            w1 = net.conv1.weight.data.cpu().numpy()
+            w2 = net.conv2.weight.data.cpu().numpy()
+            w3 = net.conv3.weight.data.cpu().numpy()
+            w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+            w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+            w3p = (subspace_projection(dim3,w3,basis3,basis_indices3))
+            net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor).cuda()
+            net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor).cuda()
+            net.conv3.weight.data = (torch.from_numpy(w3p)).type(torch.FloatTensor).cuda()
+        else:
+            w1 = net.conv1.weight.data.numpy()
+            w2 = net.conv2.weight.data.numpy()
+            w3 = net.conv3.weight.data.numpy()
+            w1p = (subspace_projection(dim1,w1,basis1,basis_indices1))
+            w2p = (subspace_projection(dim2,w2,basis2,basis_indices2))
+            w3p = (subspace_projection(dim3,w3,basis3,basis_indices3))
+            net.conv1.weight.data = (torch.from_numpy(w1p)).type(torch.FloatTensor)
+            net.conv2.weight.data = (torch.from_numpy(w2p)).type(torch.FloatTensor)
+            net.conv3.weight.data = (torch.from_numpy(w3p)).type(torch.FloatTensor)
 
     # record accuracy on test set
     correct = 0.0
