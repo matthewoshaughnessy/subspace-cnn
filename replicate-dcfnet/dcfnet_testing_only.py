@@ -21,11 +21,11 @@ outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"
 
 filename = './3layerCNN'
-if len(sys.argv) > 2
+if len(sys.argv) > 2:
     filename = sys.argv[2]
 
 noise_std = 0.01
-if len(sys.argv) > 3
+if len(sys.argv) > 3:
     noise_std = sys.argv[3]
 
 
