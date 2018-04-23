@@ -4,11 +4,11 @@ import scipy.fftpack
 
 def subspace_projection(k,w,basis=None, basis_indices=None):
     """
-	n: Image height
-	k: subspace dimension
-	F: number of filters
-	w: Filter coefficient: (F x C x HH x WW )
-	"""
+    n: Image height
+    k: subspace dimension
+    F: number of filters
+    w: Filter coefficient: (F x C x HH x WW )
+    """
     F,C,HH,WW = w.shape
     if basis is None:
         basis = scipy.fftpack.dct(np.eye(HH*WW),norm='ortho')
