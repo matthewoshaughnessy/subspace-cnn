@@ -1,4 +1,4 @@
-import numpy as np
+mport numpy as np
 import pickle
 import torch
 import torchvision
@@ -16,8 +16,25 @@ import sys
 import time
 
 
+outputName = sys.argv[1]
+outputFile = outputName + ".txt"
+outputMat = outputName + ".mat"
+
+filename = './3layerCNN'
+if len(sys.argv) > 2
+    filename = sys.argv[2]
+
+noise_std = 0.01
+if len(sys.argv) > 3
+    noise_std = sys.argv[3]
 
 
+def printlog(text,filename):
+    print(text)
+    print(text, file=open(filename,'a'))
+
+
+printlog("reading weigts from ",filename, " noise std dev: ", noise_std)
 
 class Net(nn.Module):
     def __init__(self):
@@ -31,7 +48,6 @@ class Net(nn.Module):
         self.pool = nn.MaxPool2d(3, 3)
         self.fc1 = nn.Linear(256, 512)
         self.fc2 = nn.Linear(512, 10)
-
     def forward(self, x):
         x = self.pool(F.relu(self.bn1(self.conv1(x))))
         x = self.pool(F.relu(self.bn2(self.conv2(x))))
@@ -45,7 +61,7 @@ class Net(nn.Module):
 
 net = Net()
 
-lr_def = 0.05
+lr_def = 0.005
 momentum_def = 0.9
 
 criterion = nn.CrossEntropyLoss()
@@ -58,7 +74,7 @@ print("Weights Loaded!")
 transform = transforms.Compose(
     [transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-    
+
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
                                        download=True, transform=transform)
 
@@ -75,7 +91,7 @@ for data in testloader:
     count = count+1
     print("testing example number ",count)
     inputs, labels = data
-    
+
     if torch.cuda.is_available():
         inputs, labels = Variable(inputs.cuda(),requires_grad=True), labels.cuda()
         outputs = net(inputs)
@@ -86,7 +102,7 @@ for data in testloader:
     loss.backward()
 
     # Add perturbation
-    epsilon = 0.01 
+    epsilon = noise_std
     x_grad   = torch.sign(inputs.grad.data)
    # x_adversarial = torch.clamp(inputs.data + epsilon * x_grad, -1, 1) 
     x_adversarial = inputs.data+epsilon*x_grad
@@ -94,13 +110,13 @@ for data in testloader:
     _,y_pred_adversarial = torch.max(net(Variable(x_adversarial)).data,1)
 
     _, predicted = torch.max(outputs.data, 1)
-   
-    
+
+
 
     total += labels.size(0)
     correct += (predicted == labels).sum()
-    correct_adv+= (y_pred_adversarial == labels).sum()    
+    correct_adv+= (y_pred_adversarial == labels).sum()
 
 #testaccuracy_history[epoch] = correct / total
-print('--> Accuracy of this model is: ',(100 * correct / total))
-print('--> Accuracy of this model on adverserial examples is: ',(100 * correct_adv / total))
+printlog('--> Accuracy of this model is: ',(100 * correct / total),filename)
+printlog('--> Accuracy of this model on adverserial examples is: ',(100 * correct_adv / total),filename)
