@@ -37,7 +37,7 @@ if len(sys.argv) > 4:
     basisType = sys.argv[4]
 lr_def = 0.005
 momentum_def = 0.9
-lr_decay = 0.5
+lr_decay = 0.8
 batch_size = 128
 
 ### helper functions #############################################
