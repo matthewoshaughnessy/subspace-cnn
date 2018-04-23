@@ -1,8 +1,10 @@
 ##################################################################
 ### Replicate results from Qiu et al. 2018, DCFNet (arXiv) #######
 ##################################################################
+# This version inputs the dimension of the subspace to project onto
 
 import numpy as np
+import numpy.random
 import pickle
 import torch
 import torchvision
@@ -12,6 +14,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import scipy
 import scipy.fftpack
+import scipy.linalg
 import scipy.io as sio
 from Projection.basis_gen import *
 import torch.optim as optim
@@ -30,22 +33,13 @@ if len(sys.argv) > 2 and (sys.argv[2].lower() == 'true'):
 noisyData = False
 if len(sys.argv) > 3 and (sys.argv[3].lower() == 'true'):
     noisyData = True
-
-lr_def = 0.005
+subspaceDim = 12
 if len(sys.argv) > 4:
-    lr_def = float(sys.argv[4])
-print("Default learning rate is: ",lr_def)
+    subspaceDim = float(sys.argv[4])
+lr_def = 0.005
 momentum_def = 0.9
-if len(sys.argv) > 5:
-    momentum_def = float(sys.argv[5])
-print("Default momentum is: ", momentum_def)
-lr_decay = 0.8
-if len(sys.argv) > 6:
-    lr_decay = float(sys.argv[6])
-print("Default learning rate decay is: ",lr_decay)
+lr_decay = 0.5
 batch_size = 128
-if len(sys.argv) > 7:
-    batch_size = int(sys.argv[7])
 
 ### helper functions #############################################
 def unpickle(file):
@@ -73,6 +67,7 @@ if noisyData:
     printlog('Noisy test set ON', outputFile)
 else:
     printlog('Noisy test set OFF', outputFile)
+printlog('Using basis: %s' % (basisType.upper()), outputFile)
 
 transform = transforms.Compose(
     [transforms.ToTensor(),
@@ -137,21 +132,21 @@ if torch.cuda.is_available():
 F1 = (net.conv1.weight).size()[0]
 H1 = (net.conv1.weight).size()[2]
 W1 = (net.conv1.weight).size()[3]
-dim1 = np.int(0.5*H1*W1)
+dim1 = np.int(subspaceDim)
 basis_indices1 = gen_basis_indices(F1,H1,W1,dim1)
 
 # conv2
 F2 = (net.conv2.weight).size()[0]
 H2 = (net.conv2.weight).size()[2]
 W2 = (net.conv2.weight).size()[3]
-dim2 = np.int(0.5*H2*W2)
+dim2 = np.int(subspaceDim)
 basis_indices2 = gen_basis_indices(F2,H2,W2,dim2)
 
 # conv3
 F3 = (net.conv3.weight).size()[0]
 H3 = (net.conv3.weight).size()[2]
 W3 = (net.conv3.weight).size()[3]
-dim3 = np.int(0.5*H3*W3)
+dim3 = np.int(subspaceDim)
 basis_indices3 = gen_basis_indices(F3,H3,W3,dim3)
 
 # full basis
@@ -184,7 +179,7 @@ for epoch in range(nEpochs):  # loop over the dataset multiple times
     #scheduler.step()
 
     if epoch > 0 and epoch % 10 == 0:
-        optimizer.param_groups[0]['lr'] = lr_decay* optimizer.param_groups[0]['lr']
+        optimizer.param_groups[0]['lr'] = lr_decay*optimizer.param_groups[0]['lr']
 
     printlog( 'Epoch %d: lr = %f' % (epoch,float(optimizer.param_groups[0]['lr'])), outputFile)
 
@@ -331,7 +326,11 @@ sio.savemat(outputMat,{
     'loss_history' : loss_history,
     'testaccuracy_history' : testaccuracy_history,
     'time_history' : time_history,
+    'basis1'  : basis1,
+    'basis2'  : basis2,
+    'basis3'  : basis3,
     'coeff_1' : coeff_fil_1_ch_1,
     'coeff_2' : coeff_fil_1_ch_2,
     'coeff_3' : coeff_fil_1_ch_3})
 printlog('done!', outputFile)
+
