@@ -335,4 +335,3 @@ sio.savemat(outputMat,{
     'coeff_2' : coeff_fil_1_ch_2,
     'coeff_3' : coeff_fil_1_ch_3})
 printlog('done!', outputFile)
-
