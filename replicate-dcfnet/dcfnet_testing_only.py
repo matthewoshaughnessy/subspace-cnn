@@ -33,8 +33,8 @@ def printlog(text,filename):
     print(text)
     print(text, file=open(filename,'a'))
 
-
-printlog("reading weigts from ",filename, " noise std dev: ", noise_std)
+print_str = "reading weights from "+filename+" noise std dev: "+noise_std 
+printlog(print_str, outputFile)
 
 class Net(nn.Module):
     def __init__(self):
@@ -118,5 +118,5 @@ for data in testloader:
     correct_adv+= (y_pred_adversarial == labels).sum()
 
 #testaccuracy_history[epoch] = correct / total
-printlog('--> Accuracy of this model is: ',(100 * correct / total),filename)
-printlog('--> Accuracy of this model on adverserial examples is: ',(100 * correct_adv / total),filename)
+printlog('--> Accuracy of this model is: ',(100 * correct / total),outputFile)
+printlog('--> Accuracy of this model on adverserial examples is: ',(100 * correct_adv / total),outputFile)
