@@ -26,7 +26,7 @@ if len(sys.argv) > 2:
 
 noise_std = 0.01
 if len(sys.argv) > 3:
-    noise_std = sys.argv[3]
+    noise_std = (sys.argv[3])
 
 
 def printlog(text,filename):
@@ -102,7 +102,7 @@ for data in testloader:
     loss.backward()
 
     # Add perturbation
-    epsilon = noise_std
+    epsilon = float(noise_std)
     x_grad   = torch.sign(inputs.grad.data)
    # x_adversarial = torch.clamp(inputs.data + epsilon * x_grad, -1, 1) 
     x_adversarial = inputs.data+epsilon*x_grad
