@@ -1,0 +1,53 @@
+Pytorch version:
+0.3.1.post2
+Output name: out_adv_proj_nonoise
+Outputting debug data to: out_adv_proj_nonoise.txt
+Outputting matlab data to: out_adv_proj_nonoise.mat
+Subspace projection ON
+Noisy test set OFF
+Using basis: DCT
+Epoch 0: lr = 0.005000
+[1,    10] loss: 2.28882
+[1,    20] loss: 2.19309
+[1,    30] loss: 2.11368
+[1,    40] loss: 2.02297
+[1,    50] loss: 1.88754
+[1,    60] loss: 1.83462
+[1,    70] loss: 1.74906
+[1,    80] loss: 1.61566
+[1,    90] loss: 1.53470
+[1,   100] loss: 1.56112
+[1,   110] loss: 1.50138
+[1,   120] loss: 1.51232
+[1,   130] loss: 1.46551
+[1,   140] loss: 1.48998
+[1,   150] loss: 1.40100
+[1,   160] loss: 1.40391
+[1,   170] loss: 1.35864
+[1,   180] loss: 1.39186
+[1,   190] loss: 1.34810
+[1,   200] loss: 1.30201
+[1,   210] loss: 1.30397
+[1,   220] loss: 1.32160
+[1,   230] loss: 1.24666
+[1,   240] loss: 1.21906
+[1,   250] loss: 1.23804
+[1,   260] loss: 1.27816
+[1,   270] loss: 1.27302
+[1,   280] loss: 1.19616
+[1,   290] loss: 1.20907
+[1,   300] loss: 1.23602
+[1,   310] loss: 1.17492
+[1,   320] loss: 1.15335
+[1,   330] loss: 1.19124
+[1,   340] loss: 1.16525
+[1,   350] loss: 1.15078
+[1,   360] loss: 1.19688
+[1,   370] loss: 1.18192
+[1,   380] loss: 1.14625
+[1,   390] loss: 1.13885
+--> Accuracy after epoch 0: 61 %
+Finished Training
+Accuracy of the network on the 10000 test images: 61 %
+Saving data to mat file...
+done!
