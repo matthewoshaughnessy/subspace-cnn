@@ -118,5 +118,8 @@ for data in testloader:
     correct_adv+= (y_pred_adversarial == labels).sum()
 
 #testaccuracy_history[epoch] = correct / total
-printlog('--> Accuracy of this model is: ',(100 * correct / total),outputFile)
-printlog('--> Accuracy of this model on adverserial examples is: ',(100 * correct_adv / total),outputFile)
+
+str1 = '--> Accuracy of this model is: '+str(100 * correct / total)
+str2 = '--> Accuracy of this model on adverserial examples is: '+str(100 * correct_adv / total)
+printlog(str1,outputFile)
+printlog(str2,outputFile)
