@@ -67,7 +67,7 @@ momentum_def = 0.9
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=lr_def, momentum=momentum_def)
 
-net.load_state_dict(torch.load('./3layerCNN'))
+net.load_state_dict(torch.load(filename))
 
 print("Weights Loaded!")
 
