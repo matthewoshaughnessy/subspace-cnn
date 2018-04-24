@@ -22,7 +22,7 @@ import sys
 import time
 
 ### parameters ###################################################
-nEpochs = 30
+nEpochs = 1 
 outputName = sys.argv[1]
 outputFile = outputName + ".txt"
 outputMat = outputName + ".mat"

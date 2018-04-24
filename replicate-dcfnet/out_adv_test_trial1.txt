@@ -1,0 +1,8 @@
+reading weights from ./model_out_adv_noproj_nonoise noise std dev: 0.01
+reading weights from ./model_out_adv_noproj_nonoise noise std dev: 0.01
+reading weights from ./model_out_adv_noproj_nonoise noise std dev: 0.001
+--> Accuracy of this model is: 45.0
+--> Accuracy of this model on adverserial examples is: 43.9
+reading weights from ./model_out_adv_noproj_nonoise noise std dev: 0.001
+--> Accuracy of this model is: 45.0
+--> Accuracy of this model on adverserial examples is: 43.9
