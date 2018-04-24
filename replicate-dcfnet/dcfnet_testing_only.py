@@ -92,12 +92,12 @@ for data in testloader:
     print("testing example number ",count)
     inputs, labels = data
 
-    if torch.cuda.is_available():
-        inputs, labels = Variable(inputs.cuda(),requires_grad=True), labels.cuda()
-        outputs = net(inputs)
-    else:
-        inputs, labels = Variable(inputs,requires_grad=True), labels
-        outputs = net(inputs)
+    #if torch.cuda.is_available():
+      #  inputs, labels = Variable(inputs.cuda(),requires_grad=True), labels.cuda()
+     #   outputs = net(inputs)
+    #else:
+    inputs, labels = Variable(inputs,requires_grad=True), labels
+    outputs = net(inputs)
     loss = criterion(outputs, Variable(labels))
     loss.backward()
 
