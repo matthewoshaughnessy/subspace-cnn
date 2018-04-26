@@ -36,7 +36,7 @@ if len(sys.argv) > 2:
 noise_name = '10'
 if (len(sys.argv) > 3 and (sys.argv[3]==5 or sys.argv[3]==10 or sys.argv[3]==15)):
     noise_name = sys.argv[3]
-noise_filename = './data/cifar-10-batches-py/test_batch_noisy_snp_r'+noise_name
+noise_filename = 'test_batch_noisy_snp_r'+noise_name
 
 
 def printlog(text,filename):
@@ -91,7 +91,7 @@ transform = transforms.Compose(
 
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,download=True, transform=transform)
                                        
-test_batch_noisy = unpickle()
+test_batch_noisy = unpickle(noise_filename)
 features = np.reshape(test_batch_noisy,(10000,3,32,32)).astype('uint8')
 features = np.transpose(features,(0,2,3,1))
 testset.test_data = features
