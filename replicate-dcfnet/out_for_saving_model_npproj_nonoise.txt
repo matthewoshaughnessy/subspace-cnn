@@ -1,0 +1,9 @@
+Pytorch version:
+0.3.1.post2
+Output name: out_for_saving_model_npproj_nonoise
+Outputting debug data to: out_for_saving_model_npproj_nonoise.txt
+Outputting matlab data to: out_for_saving_model_npproj_nonoise.mat
+Subspace projection OFF
+Noisy test set OFF
+Epoch 0: lr = 0.005000
+[1,    10] loss: 2.29810
