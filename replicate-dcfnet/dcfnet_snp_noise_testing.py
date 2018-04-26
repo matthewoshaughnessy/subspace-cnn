@@ -33,9 +33,10 @@ filename = './3layerCNN'
 if len(sys.argv) > 2:
     filename = sys.argv[2]
 
-noise_std = 0.01
-if len(sys.argv) > 3:
-    noise_std = (sys.argv[3])
+noise_name = '10'
+if (len(sys.argv) > 3 and (sys.argv[3]==5 or sys.argv[3]==10 or sys.argv[3]==15)):
+    noise_name = sys.argv[3]
+noise_filename = './data/cifar-10-batches-py/test_batch_noisy_snp_r'+noise_name
 
 
 def printlog(text,filename):
@@ -90,7 +91,7 @@ transform = transforms.Compose(
 
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,download=True, transform=transform)
                                        
-test_batch_noisy = unpickle('./data/cifar-10-batches-py/test_batch_noisy_snp_r10')
+test_batch_noisy = unpickle()
 features = np.reshape(test_batch_noisy,(10000,3,32,32)).astype('uint8')
 features = np.transpose(features,(0,2,3,1))
 testset.test_data = features
@@ -113,16 +114,16 @@ for data in testloader:
     #else:
     inputs, labels = Variable(inputs,requires_grad=True), labels
     outputs = net(inputs)
-    loss = criterion(outputs, Variable(labels))
-    loss.backward()
-
-    # Add perturbation
-    epsilon = float(noise_std)
-    x_grad   = torch.sign(inputs.grad.data)
-   # x_adversarial = torch.clamp(inputs.data + epsilon * x_grad, -1, 1) 
-    x_adversarial = inputs.data+epsilon*x_grad
-    # Classification after optimization  
-    _,y_pred_adversarial = torch.max(net(Variable(x_adversarial)).data,1)
+#    loss = criterion(outputs, Variable(labels))
+#    loss.backward()
+#
+#    # Add perturbation
+#    epsilon = float(noise_std)
+#    x_grad   = torch.sign(inputs.grad.data)
+#   # x_adversarial = torch.clamp(inputs.data + epsilon * x_grad, -1, 1) 
+#    x_adversarial = inputs.data+epsilon*x_grad
+#    # Classification after optimization  
+#    _,y_pred_adversarial = torch.max(net(Variable(x_adversarial)).data,1)
 
     _, predicted = torch.max(outputs.data, 1)
 
@@ -130,11 +131,11 @@ for data in testloader:
 
     total += labels.size(0)
     correct += (predicted == labels).sum()
-    correct_adv+= (y_pred_adversarial == labels).sum()
+#    correct_adv+= (y_pred_adversarial == labels).sum()
 
 #testaccuracy_history[epoch] = correct / total
 
-str1 = '--> Accuracy of this model is: '+str(100 * correct / total)
-str2 = '--> Accuracy of this model on images with snp noise, ratio = 0.1  is: '+str(100 * correct_adv / total)
+str1 = '--> Accuracy of this model with snp noisy data is: '+str(100 * correct / total)+'ratio of corrupted pixles: '+noise_name
+#str2 = '--> Accuracy of this model on images with snp noise, ratio = 0.1  is: '+str(100 * correct_adv / total)
 printlog(str1,outputFile)
-printlog(str2,outputFile)
+#printlog(str2,outputFile)
