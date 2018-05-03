@@ -24,7 +24,7 @@ filename = './3layerCNN'
 if len(sys.argv) > 2:
     filename = sys.argv[2]
 
-noise_std = 0.01
+noise_std = '0.01'
 if len(sys.argv) > 3:
     noise_std = (sys.argv[3])
 
@@ -67,7 +67,8 @@ momentum_def = 0.9
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=lr_def, momentum=momentum_def)
 
-net.load_state_dict(torch.load(filename))
+saved_state = torch.load(filename, map_location=lambda storage, loc: storage)
+net.load_state_dict(saved_state)
 
 print("Weights Loaded!")
 
@@ -89,37 +90,38 @@ count = 0
 
 for data in testloader:
     count = count+1
-    print("testing example number ",count)
-    inputs, labels = data
-
-    #if torch.cuda.is_available():
-      #  inputs, labels = Variable(inputs.cuda(),requires_grad=True), labels.cuda()
-     #   outputs = net(inputs)
-    #else:
-    inputs, labels = Variable(inputs,requires_grad=True), labels
-    outputs = net(inputs)
-    loss = criterion(outputs, Variable(labels))
-    loss.backward()
-
-    # Add perturbation
-    epsilon = float(noise_std)
-    x_grad   = torch.sign(inputs.grad.data)
-   # x_adversarial = torch.clamp(inputs.data + epsilon * x_grad, -1, 1) 
-    x_adversarial = inputs.data+epsilon*x_grad
-    # Classification after optimization  
-    _,y_pred_adversarial = torch.max(net(Variable(x_adversarial)).data,1)
-
-    _, predicted = torch.max(outputs.data, 1)
-
-
-
-    total += labels.size(0)
-    correct += (predicted == labels).sum()
-    correct_adv+= (y_pred_adversarial == labels).sum()
+    if count ==1:
+        print("testing example number ",count)
+        inputs, labels = data
+    
+        #if torch.cuda.is_available():
+          #  inputs, labels = Variable(inputs.cuda(),requires_grad=True), labels.cuda()
+         #   outputs = net(inputs)
+        #else:
+        inputs, labels = Variable(inputs,requires_grad=True), labels
+        outputs = net(inputs)
+        loss = criterion(outputs, Variable(labels))
+        loss.backward()
+    
+        # Add perturbation
+        epsilon = float(noise_std)
+        x_grad   = torch.sign(inputs.grad.data)
+       # x_adversarial = torch.clamp(inputs.data + epsilon * x_grad, -1, 1) 
+        x_adversarial = inputs.data+epsilon*x_grad
+        # Classification after optimization  
+        _,y_pred_adversarial = torch.max(net(Variable(x_adversarial)).data,1)
+    
+        _, predicted = torch.max(outputs.data, 1)
+    
+    
+    
+        total += labels.size(0)
+        correct += (predicted == labels).sum()
+        correct_adv+= (y_pred_adversarial == labels).sum()
 
 #testaccuracy_history[epoch] = correct / total
 
-str1 = '--> Accuracy of this model is: '+str(100 * correct / total)
-str2 = '--> Accuracy of this model on adverserial examples is: '+str(100 * correct_adv / total)
-printlog(str1,outputFile)
-printlog(str2,outputFile)
+#str1 = '--> Accuracy of this model is: '+str(100 * correct / total)
+#str2 = '--> Accuracy of this model on adverserial examples is: '+str(100 * correct_adv / total)
+#printlog(str1,outputFile)
+#printlog(str2,outputFile)

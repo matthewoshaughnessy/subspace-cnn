@@ -1,0 +1,17 @@
+reading weights from ./model_out_adv_noproj_nonoise
+--> Accuracy of this model is: 44.73
+--> Accuracy of this model on images with snp noise, ratio = 0.1  is: 27.03
+reading weights from ./model_out_adv_proj_nonoise
+--> Accuracy of this model is: 52.02
+--> Accuracy of this model on images with snp noise, ratio = 0.1  is: 32.99
+reading weights from ./model_out_adv_proj_nonoise
+reading weights from ./model_out_adv_noproj_nonoise
+reading weights from ./model_out_adv_noproj_nonoise
+--> Accuracy of this model is: 51.98
+--> Accuracy of this model on images with snp noise, ratio = 0.1  is: 32.75
+reading weights from ./model_out_adv_proj_nonoise
+--> Accuracy of this model is: 49.16
+--> Accuracy of this model on images with snp noise, ratio = 0.1  is: 27.32
+reading weights from ./model_out_adv_noproj_nonoise
+--> Accuracy of this model is: 51.98
+--> Accuracy of this model on images with snp noise, ratio = 0.1  is: 32.75

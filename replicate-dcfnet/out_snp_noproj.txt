@@ -1,0 +1,51 @@
+reading weights from ./model_noproj_nonoise_good
+reading weights from ./model_noproj_nonoise_good
+reading weights from ./model_noproj_nonoise_good
+reading weights from ./model_noproj_nonoise_good
+reading weights from ./model_noproj_nonoise_good
+reading weights from ./model_noproj_nonoise_good
+reading weights from ./model_noproj_nonoise_good
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 52.66ratio of corrupted pixles: 5
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 49.83ratio of corrupted pixles: 6
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 47.87ratio of corrupted pixles: 7
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 46.66ratio of corrupted pixles: 8
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 45.31ratio of corrupted pixles: 9
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 52.29ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 43.24ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 43.24ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 43.24ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 43.24ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 43.24ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 43.24ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 43.24ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 43.24ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 53.76ratio of corrupted pixles: 5
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 50.54ratio of corrupted pixles: 6
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 48.38ratio of corrupted pixles: 7
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 46.84ratio of corrupted pixles: 8
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 45.29ratio of corrupted pixles: 9
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 43.24ratio of corrupted pixles: 10
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 37.63ratio of corrupted pixles: 15
+reading weights from ./model_noproj_nonoise_good
+--> Accuracy of this model with snp noisy data is: 32.0ratio of corrupted pixles: 20
