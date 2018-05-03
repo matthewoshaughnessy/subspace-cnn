@@ -34,9 +34,9 @@ if len(sys.argv) > 2:
     filename = sys.argv[2]
 
 noise_name = '10'
-if (len(sys.argv) > 3 and (sys.argv[3]==5 or sys.argv[3]==10 or sys.argv[3]==15)):
+if (len(sys.argv) > 3):
     noise_name = sys.argv[3]
-noise_filename = 'test_batch_noisy_snp_r'+noise_name
+noise_filename = 'smooth_data_r'+noise_name
 
 
 def printlog(text,filename):
