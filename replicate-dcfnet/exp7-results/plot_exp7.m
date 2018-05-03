@@ -53,7 +53,7 @@ hl = legend([h(1,1) h(2,1) h(3,1) h(4,1)], ...
   'Noisy, projection');
 set(hl,'interpreter','latex','location','northeast');
 set(gca,'yscale','log');
-export_fig -transparent exp7_plot1.pdf
+%export_fig -transparent exp7_plot1.pdf
 
 
 %%
@@ -74,5 +74,5 @@ hl = legend('No noise, no projection', ...
   'Noisy, no projection', ...
   'Noisy, projection');
 set(hl,'interpreter','latex','location','southeast');
-export_fig -transparent exp7_plot2.pdf
+%export_fig -transparent exp7_plot2.pdf
 

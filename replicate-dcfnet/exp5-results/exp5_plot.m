@@ -49,7 +49,7 @@ ylabel(sprintf('Loss (length-%d MA)',ma_filt_length),'interpreter','latex');
 hl = legend(cellfun(@(x)['Trial ' num2str(x)],num2cell(1:5),'uniformoutput',false));
 set(hl,'interpreter','latex','location','northeast');
 set(gca,'yscale','log');
-export_fig -transparent exp5_plot1.pdf
+%export_fig -transparent exp5_plot1.pdf
 
 
 %%
@@ -66,5 +66,5 @@ xlabel('Epoch','interpreter','latex');
 ylabel('Accuracy (\%)','interpreter','latex');
 hl = legend(cellfun(@(x)['Trial ' num2str(x)],num2cell(1:5),'uniformoutput',false));
 set(hl,'interpreter','latex','location','southeast');
-export_fig -transparent exp5_plot2.pdf
+%export_fig -transparent exp5_plot2.pdf
 
