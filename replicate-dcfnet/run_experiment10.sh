@@ -1,0 +1,10 @@
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out1_old false true
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out2_old false true
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out3_old false true
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out4_old false true
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out5_old false true
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out1_new true true
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out2_new true true
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out3_new true true
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out4_new true true
+CUDA_VISIBLE_DEVICES=3 python3 dcfnet_tricks.py out5_new true true
