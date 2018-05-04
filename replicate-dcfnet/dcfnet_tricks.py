@@ -4,8 +4,9 @@
 
 # Add some tricks:
 #  -- normalize input images to be N(0,1) (was N(0.5,0.5))
-#  -- He normalization
+#  -- He initialization
 #  -- larger batch size (512 vs 128)
+#  -- use Adam optimizer
 
 import numpy as np
 import pickle
@@ -52,9 +53,6 @@ lr_decay = 0.8
 if len(sys.argv) > 7:
     lr_decay = float(sys.argv[7])
 print("Default learning rate decay is: ",lr_decay)
-batch_size = 128
-if len(sys.argv) > 8:
-    batch_size = int(sys.argv[8])
 
 ### helper functions #############################################
 def unpickle(file):
@@ -96,8 +94,13 @@ else:
 # get training data
 trainset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
-                                          shuffle=True, num_workers=4)
+
+if useTricks:
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=512,
+                                              shuffle=True, num_workers=4)
+else:
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=128,
+                                              shuffle=True, num_workers=4)
 
 # get (potentially noisy) test data
 testset = torchvision.datasets.CIFAR10(root='./data', train=False,
@@ -189,8 +192,10 @@ basis3 = scipy.fftpack.dct(np.eye(H3*W3),norm='ortho')
 ### Define a Loss function and optimizer ################################
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=lr_def, momentum=momentum_def)
-#optimizer = torch.optim.Adam(net.parameters(), lr=2e-6)
+if useTricks:
+    optimizer = torch.optim.Adam(net.parameters(), lr=2e-6)
+else:
+    optimizer = optim.SGD(net.parameters(), lr=lr_def, momentum=momentum_def)
 #scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
 
 #### Train the network #################################################
